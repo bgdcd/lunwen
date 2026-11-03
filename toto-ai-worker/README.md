@@ -17,6 +17,16 @@ GitHub Pages 是静态托管，不能安全保存火山方舟 API Key。请把 `
 3. 部署后访问 `https://你的-worker域名/health`，看到 `{"ok":true,...}` 即表示后端在线。
 4. 打开实验室，点击拓拓 → 连接设置，填写 `https://你的-worker域名/chat` 并保存，即可开始对话。
 
+## 主实验室自由创作页接入云端拓拓
+
+根目录 `index.html` 的自由创作工作台聊天现已支持直接调用同一个 Worker：
+1. 打开主实验室页面，进入右侧拓拓聊天区，点击“云端 AI 连接设置”。
+2. 填入 Cloudflare Worker 的完整聊天地址，例如 `https://你的-worker.workers.dev/chat`。地址只保存在当前浏览器的 localStorage，不包含 API Key。
+3. 发送问题时，页面会把最近对话、当前自由创作画布中的图形对象（最多 20 个，含各顶点角度、旋转和坐标）以及最近一次几何检测摘要发送给 Worker。
+4. Worker 返回的回答显示在原聊天窗口中；没有配置云端地址时，页面继续使用原有本地知识回答。
+
+此接入不会让 Worker 直接读取屏幕或图像。几何检测摘要来自页面已有的检测面板文字，几何对象数据来自实际编辑器状态。若要使用云端模型，仍须先部署 Worker 并配置 `ARK_API_KEY` 与 `ARK_MODEL`。Worker 未部署或网络请求失败时，界面会显示错误提示，不会伪称云端回答成功。
+
 ## 火山方舟接口
 后端调用 `POST https://ark.cn-beijing.volces.com/api/v3/chat/completions`，使用 Bearer API Key。模型由 `ARK_MODEL` 环境变量指定，不把任何密钥写入仓库。
 
