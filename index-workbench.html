@@ -41,6 +41,10 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#dce8e9}
 .toto-msg.user{align-self:flex-end;background:linear-gradient(135deg,#1d91a9,#3567b6);color:white;border-top-right-radius:4px}
 .toto-ai-status{min-height:18px;padding:0 15px 7px;color:#80c9d7;font-size:11px}
 .toto-ai-compose{padding:11px 12px 13px;border-top:1px solid rgba(133,225,238,.2);background:rgba(3,17,31,.45)}
+.toto-ai-context{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:0 0 9px;padding:9px;border:1px solid rgba(115,213,229,.16);border-radius:11px;background:rgba(37,105,132,.10)}
+.toto-ai-context-title{grid-column:1/-1;color:#9bd9e5;font-size:10px;letter-spacing:.06em}
+.toto-ai-context label{display:flex;flex-direction:column;gap:4px;color:#83b9c6;font-size:10px;min-width:0}
+.toto-ai-context select{width:100%;min-width:0;background:#071a2b;border:1px solid rgba(132,218,231,.25);border-radius:7px;color:#e8fbff;padding:7px 6px;font-size:11px;outline:none}
 .toto-ai-endpoint{display:none;margin-bottom:9px}.toto-ai-endpoint.show{display:block}
 .toto-ai-endpoint input{width:100%;box-sizing:border-box;background:#071a2b;border:1px solid rgba(132,218,231,.3);border-radius:8px;color:#e8fbff;padding:8px;font-size:11px;outline:none}
 .toto-ai-tools{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:10px;color:#83b9c6}
@@ -82,6 +86,12 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#dce8e9}
     <div class="toto-ai-compose">
       <div class="toto-ai-tools"><span>对话内容仅在本次页面会话中保留</span><button id="toto-ai-stop" type="button">停止回答</button><button id="toto-ai-settings" type="button">连接设置</button><button id="toto-ai-clear" type="button">清空对话</button></div>
       <div class="toto-ai-endpoint" id="toto-ai-endpoint"><input id="toto-ai-api" type="url" placeholder="粘贴已部署的拓拓 Worker 地址，例如 https://xxx.workers.dev/chat" aria-label="拓拓 AI 服务地址"></div>
+      <div class="toto-ai-context" aria-label="当前探究情境">
+        <div class="toto-ai-context-title">告诉拓拓：你现在正在研究什么？（情境由你选择，并非自动识别画布）</div>
+        <label>研究图形<select id="toto-ai-shape"><option value="未指定">未指定</option><option value="正三角形">正三角形</option><option value="正方形">正方形</option><option value="正五边形">正五边形</option><option value="正六边形">正六边形</option><option value="自定义多边形">自定义多边形</option><option value="多种图形组合">多种图形组合</option></select></label>
+        <label>正在进行<select id="toto-ai-action"><option value="未指定">未指定</option><option value="观察图形">观察图形</option><option value="拖动拼接">拖动拼接</option><option value="旋转图形">旋转图形</option><option value="尝试密铺">尝试密铺</option><option value="检查顶点角度">检查顶点角度</option><option value="比较平面与立体">比较平面与立体</option></select></label>
+        <label>遇到的情况<select id="toto-ai-issue"><option value="未指定">未指定</option><option value="出现缝隙">出现缝隙</option><option value="图形发生重叠">图形发生重叠</option><option value="边无法贴合">边无法贴合</option><option value="顶点角度不等于360度">顶点角度不等于360度</option><option value="不知道从哪里开始">不知道从哪里开始</option></select></label>
+      </div>
       <div class="toto-ai-row"><textarea id="toto-ai-input" rows="1" placeholder="输入你想问拓拓的问题…"></textarea><button id="toto-ai-send" type="button">发送</button></div>
     </div>
   </section>
@@ -545,13 +555,15 @@ requestAnimationFrame(frame);
    const endpoint=api.value.trim()||window.TOTO_AI_API||'';
    if(!endpoint){settings.classList.add('show');setStatus('请先在“连接设置”中填写已部署的拓拓 AI 服务地址');return;}
    add(q,'user');input.value='';history.push({role:'user',content:q});busy=true;send.disabled=true;send.textContent='…';setStatus('拓拓正在思考…');robot.dataset.aiState='thinking';panel.dataset.busy='true';
+   const sceneContext={shape:$('toto-ai-shape').value,action:$('toto-ai-action').value,issue:$('toto-ai-issue').value};
+   const contextText=Object.entries(sceneContext).filter(([,v])=>v&&v!=='未指定').map(([k,v])=>({shape:'图形',action:'操作',issue:'遇到的情况'}[k]+'：'+v)).join('；');
    const pending=add('拓拓正在整理思路…','bot');controller=new AbortController();
    try{
-     const response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:history.slice(-16)}),signal:controller.signal});
+     const response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:history.slice(-16),sceneContext}),signal:controller.signal});
      const data=await response.json().catch(()=>({}));
      if(!response.ok)throw new Error(data.error||('服务请求失败（HTTP '+response.status+'）'));
      const answer=data.reply||data.choices?.[0]?.message?.content||'我暂时没有得到有效回答，请稍后再试。';
-     pending.textContent=answer;history.push({role:'assistant',content:answer});setStatus(data.knowledgeUsed?'已结合密铺知识库回答':'拓拓已准备好继续交流');robot.dataset.aiState='speaking';setTimeout(()=>{if(robot.dataset.aiState==='speaking')robot.dataset.aiState='idle';},1100);
+     pending.textContent=answer;history.push({role:'assistant',content:answer});setStatus((data.knowledgeUsed?'已结合密铺知识库':'已完成回答')+(contextText?' · 已参考探究情境':'') );robot.dataset.aiState='speaking';setTimeout(()=>{if(robot.dataset.aiState==='speaking')robot.dataset.aiState='idle';},1100);
    }catch(err){pending.textContent=err.name==='AbortError'?'本次回答已停止。':'连接失败：'+err.message;setStatus(err.name==='AbortError'?'已停止生成':'请检查服务地址和后端配置');robot.dataset.aiState='idle';}
    finally{busy=false;delete panel.dataset.busy;send.disabled=false;send.textContent='发送';controller=null;input.focus();}
  }
