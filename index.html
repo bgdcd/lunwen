@@ -964,7 +964,7 @@ body.room-body{margin:0;font-family:"Microsoft YaHei","PingFang SC",system-ui,sa
       </div>
       <div class="quick-asks"><button class="quick">正五边形能单独密铺吗？</button><button class="quick">第一种为什么能密铺？</button><button class="quick">足球为什么有五边形？</button><button class="quick">第二种到底是谁在密铺？</button></div>
       <form class="chat-entry" id="chatForm"><input class="chat-input" id="chatInput" autocomplete="off" placeholder="输入你的问题，和拓拓聊一聊…" /><button class="send" type="submit" aria-label="发送">➤</button></form>
-      <div class="agent-foot" id="totoCloudStatus">当前为 <span>本地密铺知识智能体</span> · 可配置云端 AI</div><div style="padding:0 14px 10px;text-align:right"><button type="button" id="totoCloudSettings" style="background:transparent;border:1px solid rgba(130,170,165,.45);border-radius:8px;padding:5px 10px;color:#c9ded8;font-size:11px;cursor:pointer">云端 AI 连接设置</button></div>
+      <div class="agent-foot" id="totoCloudStatus">当前为 <span>本地密铺知识智能体</span> · 可配置云端 AI</div><div style="padding:0 14px 10px;text-align:right"><button type="button" id="totoCloudSettings" style="background:transparent;border:1px solid rgba(130,170,165,.45);border-radius:8px;padding:5px 10px;color:#c9ded8;font-size:11px;cursor:pointer">腾讯云 AI 连接设置</button></div>
     </aside>
   </main>
 </div>
@@ -1310,11 +1310,11 @@ function respond(q){const s=q.toLowerCase().replace(/[？?！，。、“”\s]/
  if(/你好|嗨|哈喽|hello/.test(s)){return '你好呀！我是拓拓，今天陪你研究“图形怎样无缝拼在一起”。你最想挑战哪一个问题？五边形和菱形、方格里的五边形，还是足球的球面结构？';}
  return '这个问题很有探索价值！我目前专注于本实验的三类内容：<strong>正五边形与菱形组合密铺、正五边形嵌入方形 / 长方形单元、足球的五边形—六边形球面结构</strong>。<br><br>你可以把问题说得更具体一些，例如：“五边形内角是多少度？”“第二种是谁在铺满平面？”“足球为什么不是平面密铺？”我会结合沙盘给你解释。';}
 function appendMsg(who,html){const box=document.createElement('div');box.className='msg '+(who==='user'?'user':'bot');const label=document.createElement('div');label.className='msg-label';label.textContent=who==='user'?'你 · 刚刚':'拓拓 · 刚刚';const bubble=document.createElement('div');bubble.className='bubble';bubble.innerHTML=html;box.append(label,bubble);$('chatLog').appendChild(box);$('chatLog').scrollTop=$('chatLog').scrollHeight;}
-let totoCloudEndpoint=localStorage.getItem('polylab_toto_endpoint')||'';
+let totoCloudEndpoint=localStorage.getItem('polylab_toto_endpoint')||'';if(totoCloudEndpoint.includes('.workers.dev')){totoCloudEndpoint='';localStorage.removeItem('polylab_toto_endpoint');}
 let totoCloudHistory=[];
 function setTotoCloudStatus(message,online=false){$('totoCloudStatus').innerHTML='当前为 <span>'+(online?'云端 AI 已连接':'本地密铺知识智能体')+'</span> · '+escapeHtml(message);}
 $('totoCloudSettings').addEventListener('click',()=>{
- let value=prompt('请输入已部署的拓拓 Worker 地址（以 /chat 结尾），例如 https://你的-worker.workers.dev/chat。留空则使用本地知识智能体。',totoCloudEndpoint);
+ let value=prompt('请输入腾讯云 HTTP 云函数的访问地址（以 /chat 结尾），例如 https://你的云函数访问域名/chat。留空则使用本地知识智能体。',totoCloudEndpoint);
  if(value===null)return;
  value=value.trim();while(value.endsWith('/'))value=value.slice(0,-1);
  if(value&& !value.endsWith('/chat'))value+='/chat';
@@ -1348,7 +1348,7 @@ $('chatForm').addEventListener('submit',async e=>{
    setTotoCloudStatus('未设置云端地址，当前使用本地回答');
   }
  }catch(err){
-  pending.querySelector('.bubble').innerHTML='云端连接暂时失败：'+escapeHtml(err.message)+'<br>请检查 Worker 地址、部署状态和跨域设置。';
+  pending.querySelector('.bubble').innerHTML='云端连接暂时失败：'+escapeHtml(err.message)+'<br>请检查腾讯云函数地址、部署状态和跨域设置。';
   setTotoCloudStatus('云端连接失败，请检查设置或暂时使用本地模式');
  }finally{submit.disabled=false;$('chatLog').scrollTop=$('chatLog').scrollHeight;}
 });
