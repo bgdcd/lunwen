@@ -55,8 +55,21 @@
 .studio-toolbar .studio-primary{background:linear-gradient(110deg,rgba(48,155,202,.3),rgba(108,105,226,.25));border-color:rgba(96,221,255,.4);color:#e2faff}
 .studio-toolbar .studio-spacer{flex:1}
 .studio-info{font-size:10px;color:#8fa6d2;white-space:nowrap}
-.creator-board-wrap{position:relative;min-height:0;flex:1;border:1px solid rgba(108,170,255,.24);border-radius:14px;overflow:hidden;background:radial-gradient(ellipse at 48% 42%,rgba(31,62,111,.28),rgba(5,13,30,.88) 76%)}
-#creatorBoard{width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
+.creator-board-wrap{position:relative;min-height:0;flex:1;border:1px solid rgba(108,170,255,.38);border-radius:16px;overflow:hidden;isolation:isolate;background:radial-gradient(ellipse at 50% 43%,rgba(28,105,174,.25),rgba(8,22,48,.78) 55%,rgba(4,12,29,.98) 100%);box-shadow:inset 0 0 42px rgba(65,177,255,.13),0 0 26px rgba(54,155,255,.09)}
+.creator-board-wrap:before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse at 50% 82%,rgba(44,190,255,.2),transparent 38%),linear-gradient(120deg,rgba(255,204,100,.055),transparent 28%,transparent 72%,rgba(89,171,255,.09));}
+.creator-board-wrap:after{content:"";position:absolute;inset:9px;z-index:4;border:1px solid rgba(150,220,255,.16);border-radius:11px;pointer-events:none;box-shadow:inset 0 0 18px rgba(94,198,255,.06)}
+.creator-ambience{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;overflow:visible}
+.creator-ambience .core-float{transform-origin:380px 205px;animation:coreFloat 5.8s ease-in-out infinite}
+.creator-ambience .orbit-a{transform-origin:380px 205px;animation:orbitSpin 18s linear infinite}
+.creator-ambience .orbit-b{transform-origin:380px 205px;animation:orbitSpinReverse 24s linear infinite}
+.creator-ambience .platform-pulse{transform-origin:380px 420px;animation:platformPulse 3.6s ease-in-out infinite}
+.creator-ambience .spark{animation:sparkBlink 2.8s ease-in-out infinite alternate}
+@keyframes coreFloat{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-9px) rotate(2deg)}}
+@keyframes orbitSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes orbitSpinReverse{from{transform:rotate(360deg)}to{transform:rotate(0deg)}}
+@keyframes platformPulse{0%,100%{opacity:.48;transform:scaleX(.96)}50%{opacity:.95;transform:scaleX(1.03)}}
+@keyframes sparkBlink{0%{opacity:.2;transform:scale(.7)}100%{opacity:1;transform:scale(1.25)}}
+#creatorBoard{position:relative;z-index:2;width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
 .creator-board-note{position:absolute;left:13px;bottom:10px;pointer-events:none;font-size:9px;color:#819ac7;letter-spacing:.5px}
 .creator-status{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:10px;color:#92a8d2}
 .creator-status b{color:#d8e8ff;font-weight:700}.creator-status .status-dot{width:6px;height:6px;border-radius:50%;background:#69e4be;box-shadow:0 0 8px #69e4be;display:inline-block;margin-right:5px}
@@ -1014,6 +1027,36 @@ body.room-body{margin:0;font-family:"Microsoft YaHei","PingFang SC",system-ui,sa
         <button id="saveDesign">保存设计数据</button>
       </div>
       <div class="creator-board-wrap">
+        <svg class="creator-ambience" viewBox="0 0 760 520" aria-hidden="true">
+          <defs>
+            <radialGradient id="energyCore" cx="34%" cy="24%" r="78%"><stop offset="0" stop-color="#fff7cf"/><stop offset=".22" stop-color="#5fdcff"/><stop offset=".62" stop-color="#1679d8"/><stop offset="1" stop-color="#09285e"/></radialGradient>
+            <linearGradient id="goldFacet" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff1ad"/><stop offset=".45" stop-color="#ffbd45"/><stop offset="1" stop-color="#d97818"/></linearGradient>
+            <linearGradient id="blueFacet" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#baf6ff"/><stop offset=".4" stop-color="#249de9"/><stop offset="1" stop-color="#1744a6"/></linearGradient>
+            <filter id="energyGlow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <ellipse cx="380" cy="205" rx="186" ry="57" fill="none" stroke="#62dfff" stroke-width="2" opacity=".52" filter="url(#energyGlow)" class="orbit-a"/>
+          <ellipse cx="380" cy="205" rx="218" ry="77" fill="none" stroke="#ffe19a" stroke-width="1.6" opacity=".4" stroke-dasharray="68 16 12 20" class="orbit-b"/>
+          <ellipse cx="380" cy="205" rx="145" ry="112" fill="none" stroke="#5ccfff" stroke-width="1" opacity=".23" transform="rotate(-24 380 205)"/>
+          <g class="core-float" opacity=".32" filter="url(#energyGlow)">
+            <polygon points="380,102 447,145 430,218 380,252 316,218 302,148" fill="url(#energyCore)" stroke="#b7f5ff" stroke-width="2"/>
+            <polygon points="380,102 380,177 316,218 302,148" fill="url(#blueFacet)" stroke="#b7f5ff" stroke-width="1.4"/>
+            <polygon points="380,102 447,145 380,177" fill="url(#goldFacet)" stroke="#fff0bd" stroke-width="1.4"/>
+            <polygon points="447,145 430,218 380,177" fill="url(#blueFacet)" stroke="#b7f5ff" stroke-width="1.4"/>
+            <polygon points="430,218 380,252 380,177" fill="url(#goldFacet)" stroke="#fff0bd" stroke-width="1.4"/>
+            <polygon points="380,252 316,218 380,177" fill="url(#blueFacet)" stroke="#b7f5ff" stroke-width="1.4"/>
+            <path d="M380 102V252M302 148L447 145M316 218L430 218" stroke="#e7fbff" stroke-width="1" opacity=".7"/>
+          </g>
+          <g class="platform-pulse" filter="url(#energyGlow)">
+            <ellipse cx="380" cy="421" rx="264" ry="35" fill="none" stroke="#5fdcff" stroke-width="3" opacity=".72"/>
+            <ellipse cx="380" cy="421" rx="224" ry="23" fill="none" stroke="#fff0bd" stroke-width="2" opacity=".65"/>
+            <ellipse cx="380" cy="421" rx="174" ry="12" fill="none" stroke="#5fdcff" stroke-width="1.5" opacity=".8"/>
+            <path d="M116 421H644M166 432H594" stroke="#7deaff" stroke-width="1" opacity=".42"/>
+          </g>
+          <g fill="#baf5ff" filter="url(#energyGlow)">
+            <circle class="spark" cx="132" cy="150" r="2.2"/><circle class="spark" cx="604" cy="126" r="2.5"/><circle class="spark" cx="548" cy="300" r="1.8"/><circle class="spark" cx="205" cy="330" r="1.7"/><circle class="spark" cx="660" cy="350" r="1.5"/><circle class="spark" cx="92" cy="270" r="1.5"/>
+          </g>
+          <g stroke="#66dfff" stroke-width="1" opacity=".25"><path d="M380 36V72M380 340V384M52 205H88M672 205H708"/></g>
+        </svg>
         <svg id="creatorBoard" viewBox="0 0 760 520" role="img" aria-label="中央空间实验台上的图形摆放区域">
           <defs>
             <pattern id="creatorGrid" width="25" height="25" patternUnits="userSpaceOnUse"><path d="M 25 0 L 0 0 0 25" fill="none" stroke="rgba(115,166,239,.13)" stroke-width="1"/></pattern>
