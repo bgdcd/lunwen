@@ -1,7 +1,7 @@
 /**
- * 拓拓 AI · 豆包方舟安全代理 + 密铺知识检索
- * Secrets: ARK_API_KEY
- * Vars: ARK_MODEL, optional ALLOWED_ORIGIN
+ * 拓拓 AI · 阿里云百炼安全代理 + 密铺知识检索
+ * Secret: DASHSCOPE_API_KEY
+ * Vars: BAILIAN_MODEL (default qwen-plus), optional BAILIAN_BASE_URL and ALLOWED_ORIGIN
  */
 const BASE_PROMPT = `你是“拓拓”，立体密铺实验室 POLYLAB 的 AI 数学学习伙伴。服务对象是小学高年级学生和教师。
 教学风格：友好、有好奇心、讲解准确；先回应，再分步骤解释；鼓励观察—猜想—操作—验证，不替学生包办探究。
@@ -42,10 +42,10 @@ export async function handleRequest(request,env={}){
   const corsOrigin=allowed==="*"?"*":(origin===allowed?origin:"null");
   const headers=corsHeaders(corsOrigin);
   if(request.method==="OPTIONS")return new Response(null,{status:204,headers});
-  if(url.pathname==="/health"&&request.method==="GET")return new Response(JSON.stringify({ok:true,service:"toto-ai",provider:"volcengine-ark",knowledgeTopics:KNOWLEDGE.length}),{status:200,headers:{...headers,"Content-Type":"application/json; charset=utf-8"}});
+  if(url.pathname==="/health"&&request.method==="GET")return new Response(JSON.stringify({ok:true,service:"toto-ai",provider:"aliyun-bailian",model:env.BAILIAN_MODEL||"qwen-plus",knowledgeTopics:KNOWLEDGE.length}),{status:200,headers:{...headers,"Content-Type":"application/json; charset=utf-8"}});
   if(url.pathname!=="/chat"||request.method!=="POST")return new Response(JSON.stringify({error:"Not found"}),{status:404,headers:{...headers,"Content-Type":"application/json; charset=utf-8"}});
   if(corsOrigin==="null")return new Response(JSON.stringify({error:"Origin not allowed"}),{status:403,headers:{...headers,"Content-Type":"application/json; charset=utf-8"}});
-  if(!env.ARK_API_KEY||!env.ARK_MODEL)return new Response(JSON.stringify({error:"后端尚未配置 ARK_API_KEY Secret 或 ARK_MODEL"}),{status:503,headers:{...headers,"Content-Type":"application/json; charset=utf-8"}});
+  if(!env.DASHSCOPE_API_KEY)return new Response(JSON.stringify({error:"后端尚未配置阿里云百炼 API Key（DASHSCOPE_API_KEY）"}),{status:503,headers:{...headers,"Content-Type":"application/json; charset=utf-8"}});
   try{
    const raw=await request.text();
    if(raw.length>60000)return new Response(JSON.stringify({error:"消息过长，请缩短后重试"}),{status:413,headers:{...headers,"Content-Type":"application/json; charset=utf-8"}});
@@ -82,13 +82,15 @@ export async function handleRequest(request,env={}){
    const retrievalQuestion=(lastUser?.content||"")+" "+sceneText+" "+geometryText+" "+geometryReportText;
    const context=retrieve(retrievalQuestion);
    const system=BASE_PROMPT+(sceneText?"\n\n【学生主动提供的探究情境】"+sceneText+"。请结合这些信息给出针对性提示；它们是用户选择的情境，不代表你看到了页面或自动识别了画布。若信息不足，先提出一个具体观察问题。":"")+(geometryText?"\n\n"+geometryText:"")+(geometryReportText?"\n\n"+geometryReportText:"")+(context?"\n\n以下是与本轮问题相关的密铺知识资料。请优先依据这些准确知识解释，不要把资料之外的推断说成定论：\n"+context:"");
-   const upstream=await fetch("https://ark.cn-beijing.volces.com/api/v3/chat/completions",{
+   const bailianBase=(env.BAILIAN_BASE_URL||"https://dashscope.aliyuncs.com/compatible-mode/v1").replace(/\\/+$/,"");
+   const bailianModel=env.BAILIAN_MODEL||"qwen-plus";
+   const upstream=await fetch(bailianBase+"/chat/completions",{
     method:"POST",
-    headers:{"Authorization":"Bearer "+env.ARK_API_KEY,"Content-Type":"application/json"},
-    body:JSON.stringify({model:env.ARK_MODEL,messages:[{role:"system",content:system},...safe],temperature:0.65,max_tokens:1600})
+    headers:{"Authorization":"Bearer "+env.DASHSCOPE_API_KEY,"Content-Type":"application/json"},
+    body:JSON.stringify({model:bailianModel,messages:[{role:"system",content:system},...safe],temperature:0.65,max_tokens:1600})
    });
    const data=await upstream.json().catch(()=>({}));
-   if(!upstream.ok)return new Response(JSON.stringify({error:data.error?.message||data.message||("火山方舟返回错误："+upstream.status)}),{status:502,headers:{...headers,"Content-Type":"application/json; charset=utf-8"}});
+   if(!upstream.ok)return new Response(JSON.stringify({error:data.error?.message||data.message||("阿里云百炼返回错误："+upstream.status)}),{status:502,headers:{...headers,"Content-Type":"application/json; charset=utf-8"}});
    const reply=data.choices?.[0]?.message?.content;
    if(typeof reply!=="string"||!reply.trim())return new Response(JSON.stringify({error:"模型没有返回文本内容"}),{status:502,headers:{...headers,"Content-Type":"application/json; charset=utf-8"}});
    return new Response(JSON.stringify({reply,usage:data.usage||null,knowledgeUsed:!!context}),{status:200,headers:{...headers,"Content-Type":"application/json; charset=utf-8"}});
