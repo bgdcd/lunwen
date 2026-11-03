@@ -36,21 +36,22 @@ const corsHeaders = origin => ({
  "Vary":"Origin"
 });
 export default {
- async fetch(request,env){
+ async fetch(request,env={}){
+  env = env || {};
   const url=new URL(request.url),origin=request.headers.get("Origin")||"";
   const allowed=env.ALLOWED_ORIGIN||"*";
   const corsOrigin=allowed==="*"?"*":(origin===allowed?origin:"null");
   const headers=corsHeaders(corsOrigin);
   if(request.method==="OPTIONS")return new Response(null,{status:204,headers});
-  if(url.pathname==="/health"&&request.method==="GET")return Response.json({ok:true,service:"toto-ai",provider:"volcengine-ark",knowledgeTopics:KNOWLEDGE.length},{headers});
-  if(url.pathname!=="/chat"||request.method!=="POST")return Response.json({error:"Not found"},{status:404,headers});
-  if(corsOrigin==="null")return Response.json({error:"Origin not allowed"},{status:403,headers});
-  if(!env.ARK_API_KEY||!env.ARK_MODEL)return Response.json({error:"后端尚未配置 ARK_API_KEY Secret 或 ARK_MODEL"},{status:503,headers});
+  if(url.pathname==="/health"&&request.method==="GET")return new Response(JSON.stringify({ok:true,service:"toto-ai",provider:"volcengine-ark",knowledgeTopics:KNOWLEDGE.length}),{status:200,headers:{...headers,"Content-Type":"application/json; charset=utf-8"}});
+  if(url.pathname!=="/chat"||request.method!=="POST")return new Response(JSON.stringify({error:"Not found"}),{status:404,headers:{...headers,"Content-Type":"application/json; charset=utf-8"}});
+  if(corsOrigin==="null")return new Response(JSON.stringify({error:"Origin not allowed"}),{status:403,headers:{...headers,"Content-Type":"application/json; charset=utf-8"}});
+  if(!env.ARK_API_KEY||!env.ARK_MODEL)return new Response(JSON.stringify({error:"后端尚未配置 ARK_API_KEY Secret 或 ARK_MODEL"}),{status:503,headers:{...headers,"Content-Type":"application/json; charset=utf-8"}});
   try{
    const raw=await request.text();
-   if(raw.length>60000)return Response.json({error:"消息过长，请缩短后重试"},{status:413,headers});
+   if(raw.length>60000)return new Response(JSON.stringify({error:"消息过长，请缩短后重试"}),{status:413,headers:{...headers,"Content-Type":"application/json; charset=utf-8"}});
    const body=JSON.parse(raw),incoming=Array.isArray(body.messages)?body.messages:[];
-   if(!incoming.length||incoming.length>20)return Response.json({error:"messages 格式不正确"},{status:400,headers});
+   if(!incoming.length||incoming.length>20)return new Response(JSON.stringify({error:"messages 格式不正确"}),{status:400,headers:{...headers,"Content-Type":"application/json; charset=utf-8"}});
    const safe=incoming.map(m=>{
     if(!m||!["user","assistant"].includes(m.role)||typeof m.content!=="string")throw new Error("消息格式不正确");
     return {role:m.role,content:m.content.slice(0,8000)};
@@ -88,10 +89,10 @@ export default {
     body:JSON.stringify({model:env.ARK_MODEL,messages:[{role:"system",content:system},...safe],temperature:0.65,max_tokens:1600})
    });
    const data=await upstream.json().catch(()=>({}));
-   if(!upstream.ok)return Response.json({error:data.error?.message||data.message||("火山方舟返回错误："+upstream.status)},{status:502,headers});
+   if(!upstream.ok)return new Response(JSON.stringify({error:data.error?.message||data.message||("火山方舟返回错误："+upstream.status)}),{status:502,headers:{...headers,"Content-Type":"application/json; charset=utf-8"}});
    const reply=data.choices?.[0]?.message?.content;
-   if(typeof reply!=="string"||!reply.trim())return Response.json({error:"模型没有返回文本内容"},{status:502,headers});
-   return Response.json({reply,usage:data.usage||null,knowledgeUsed:!!context},{headers});
-  }catch(error){return Response.json({error:error.message||"服务器内部错误"},{status:400,headers});}
+   if(typeof reply!=="string"||!reply.trim())return new Response(JSON.stringify({error:"模型没有返回文本内容"}),{status:502,headers:{...headers,"Content-Type":"application/json; charset=utf-8"}});
+   return new Response(JSON.stringify({reply,usage:data.usage||null,knowledgeUsed:!!context}),{status:200,headers:{...headers,"Content-Type":"application/json; charset=utf-8"}});
+  }catch(error){return new Response(JSON.stringify({error:error.message||"服务器内部错误"}),{status:400,headers:{...headers,"Content-Type":"application/json; charset=utf-8"}});}
  }
 };
