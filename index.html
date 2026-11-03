@@ -1167,6 +1167,26 @@ function regularStudio(n,r,rot){return Array.from({length:n},(_,i)=>[Math.cos(ro
 const creatorBoard=$('creatorBoard'),creatorTiles=$('creatorTiles');
 function svgPoint(evt){const pt=creatorBoard.createSVGPoint();pt.x=evt.clientX;pt.y=evt.clientY;return pt.matrixTransform(creatorBoard.getScreenCTM().inverse());}
 function addStudioTile(type,x,y){const d=shapeDefs[type];if(!d)return;const k=studio.tiles.length;const t={id:studio.nextId++,type,x:x??(290+(k%5)*42),y:y??(185+Math.floor(k/5)*43),rot:0};studio.tiles.push(t);studio.selected=t.id;renderStudioTiles();return t;}
+function buildTotoGeometryState(){
+ const objects=studio.tiles.map(t=>({id:'shape-'+t.id,shape:shapeDefs[t.type].name,sides:shapeDefs[t.type].pts.length,rotationDeg:t.rot,x:Number(t.x.toFixed(2)),y:Number(t.y.toFixed(2))}));
+ return {dimension:'2d',objects};
+}
+window.TotoAI=window.TotoAI||{};
+window.TotoAI.updateGeometryState=function(value){
+ if(!value||!Array.isArray(value.objects)||value.objects.length>20)throw new Error('几何对象数量不符合要求');
+ const allowed=['正三角形','正方形','正五边形','正六边形','菱形'];
+ value.objects.forEach((o,i)=>{if(!allowed.includes(o.shape)||!Number.isInteger(o.sides)||o.sides<3||o.sides>12||![o.rotationDeg,o.x,o.y].every(Number.isFinite))throw new Error('第'+(i+1)+'个图形数据无效');});
+ const snapshot={dimension:value.dimension==='3d'?'3d':'2d',objects:value.objects.map(o=>({...o}))};
+ window.dispatchEvent(new CustomEvent('toto:geometrychange',{detail:snapshot}));
+ return {ok:true,count:snapshot.objects.length};
+};
+window.TotoAI.getGeometryState=()=>buildTotoGeometryState();
+window.TotoAI.clearGeometryState=()=>window.TotoAI.updateGeometryState({dimension:'2d',objects:[]});
+function syncTotoGeometryState(){
+ const snapshot=buildTotoGeometryState();
+ window.TotoAI.updateGeometryState(snapshot);
+ document.dispatchEvent(new CustomEvent('polylab:geometry-updated',{detail:snapshot}));
+}
 function renderStudioTiles(){creatorTiles.innerHTML='';for(const t of studio.tiles){const d=shapeDefs[t.type],g=document.createElementNS('http://www.w3.org/2000/svg','g');g.setAttribute('class','tile-shape'+(studio.selected===t.id?' selected':''));g.dataset.id=t.id;g.setAttribute('transform',`translate(${t.x} ${t.y}) rotate(${t.rot})`);g.setAttribute('tabindex','0');g.setAttribute('role','button');g.setAttribute('aria-label',d.name+'，可拖动');
  const poly=document.createElementNS('http://www.w3.org/2000/svg','polygon');poly.setAttribute('points',d.pts.map(p=>p.join(',')).join(' '));poly.setAttribute('fill',d.fill);poly.setAttribute('fill-opacity','.88');
  const title=document.createElementNS('http://www.w3.org/2000/svg','title');title.textContent=d.name;g.append(poly,title);
@@ -1176,10 +1196,11 @@ function renderStudioTiles(){creatorTiles.innerHTML='';for(const t of studio.til
  }
  $('creatorEmptyHint').style.display=studio.tiles.length?'none':'block';$('tileCount').textContent=studio.tiles.length;
  const sel=studio.tiles.find(t=>t.id===studio.selected);$('selectedTileInfo').textContent=sel?`已选中：${shapeDefs[sel.type].name} · 旋转 ${((sel.rot%360)+360)%360}°`:'尚未选中图形';
+ syncTotoGeometryState();
 }
 function studioWorldPoints(t){const a=t.rot*Math.PI/180,c=Math.cos(a),sn=Math.sin(a);return shapeDefs[t.type].pts.map(([x,y])=>[t.x+x*c-y*sn,t.y+x*sn+y*c]);}
 function vertexSnapPosition(t,x,y){let best=null,bestD=13;const candidate={...t,x,y};const a=studioWorldPoints(candidate);for(const other of studio.tiles){if(other.id===t.id)continue;const b=studioWorldPoints(other);for(let i=0;i<a.length;i++)for(let j=0;j<b.length;j++){const dx=b[j][0]-a[i][0],dy=b[j][1]-a[i][1],d=Math.hypot(dx,dy);if(d<bestD){bestD=d;best={x:x+dx,y:y+dy};}}}return best?{...best,found:true}:{x,y,found:false};}
-creatorBoard.addEventListener('pointermove',e=>{if(!studio.drag)return;const p=svgPoint(e),t=studio.tiles.find(x=>x.id===studio.drag.id);if(!t)return;const rawX=p.x-studio.drag.dx,rawY=p.y-studio.drag.dy;const snapped=vertexSnapPosition(t,rawX,rawY);let x,y;if(snapped.found){x=snapped.x;y=snapped.y;}else if(studio.snap){x=Math.round(rawX/10)*10;y=Math.round(rawY/10)*10;}else{x=rawX;y=rawY;}t.x=Math.max(65,Math.min(695,x));t.y=Math.max(65,Math.min(455,y));const g=creatorTiles.querySelector(`[data-id="${t.id}"]`);if(g)g.setAttribute('transform',`translate(${t.x} ${t.y}) rotate(${t.rot})`);$('selectedTileInfo').textContent=`已选中：${shapeDefs[t.type].name} · 位置 (${Math.round(t.x)}, ${Math.round(t.y)})`;});
+creatorBoard.addEventListener('pointermove',e=>{if(!studio.drag)return;const p=svgPoint(e),t=studio.tiles.find(x=>x.id===studio.drag.id);if(!t)return;const rawX=p.x-studio.drag.dx,rawY=p.y-studio.drag.dy;const snapped=vertexSnapPosition(t,rawX,rawY);let x,y;if(snapped.found){x=snapped.x;y=snapped.y;}else if(studio.snap){x=Math.round(rawX/10)*10;y=Math.round(rawY/10)*10;}else{x=rawX;y=rawY;}t.x=Math.max(65,Math.min(695,x));t.y=Math.max(65,Math.min(455,y));const g=creatorTiles.querySelector(`[data-id="${t.id}"]`);if(g)g.setAttribute('transform',`translate(${t.x} ${t.y}) rotate(${t.rot})`);$('selectedTileInfo').textContent=`已选中：${shapeDefs[t.type].name} · 位置 (${Math.round(t.x)}, ${Math.round(t.y)})`;syncTotoGeometryState();});
 function endStudioDrag(){studio.drag=null;renderStudioTiles();}
 creatorBoard.addEventListener('pointerup',endStudioDrag);creatorBoard.addEventListener('pointercancel',endStudioDrag);
 creatorBoard.addEventListener('pointerdown',e=>{if(e.target===creatorBoard||e.target.tagName==='rect'){studio.selected=null;renderStudioTiles();}});
