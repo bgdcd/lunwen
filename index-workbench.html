@@ -542,14 +542,15 @@ requestAnimationFrame(frame);
  // 几何编辑器通过此接口同步真实对象；展示用 3D 展台不会被误当成学生图形。
  let geometryState={dimension:"2d",objects:[]};
  const geometryStatus=$('toto-ai-geometry-status');
- const shapeNames=['正三角形','正方形','正五边形','正六边形','正多边形','自定义多边形'];
+ const shapeNames=['正三角形','正方形','正五边形','正六边形','菱形','正多边形','自定义多边形'];
  function cleanGeometryState(value){
    if(!value||typeof value!=='object'||!Array.isArray(value.objects))throw new Error('几何状态格式应为 {objects:[...]}');
    const objects=value.objects.slice(0,20).map((o,i)=>{
      if(!o||typeof o!=='object')throw new Error('第'+(i+1)+'个图形数据无效');
-     const sides=Number(o.sides),rotationDeg=Number(o.rotationDeg||0),x=Number(o.x||0),y=Number(o.y||0);
-     if(!shapeNames.includes(o.shape)||!Number.isInteger(sides)||sides<3||sides>12||!Number.isFinite(rotationDeg)||Math.abs(rotationDeg)>36000||![x,y].every(Number.isFinite)||Math.abs(x)>100000||Math.abs(y)>100000)throw new Error('第'+(i+1)+'个图形参数不符合要求');
-     return {id:String(o.id||('shape-'+(i+1))).slice(0,40),shape:o.shape,sides,rotationDeg:((rotationDeg%360)+360)%360,x,y,interiorAngleDeg:Number(((sides-2)*180/sides).toFixed(2))};
+     const sides=Number(o.sides),rotationDeg=Number(o.rotationDeg||0),x=Number(o.x||0),y=Number(o.y||0),vertexAnglesDeg=Array.isArray(o.vertexAnglesDeg)?o.vertexAnglesDeg.map(Number):null;
+     if(!shapeNames.includes(o.shape)||!Number.isInteger(sides)||sides<3||sides>12||!Number.isFinite(rotationDeg)||Math.abs(rotationDeg)>36000||![x,y].every(Number.isFinite)||Math.abs(x)>100000||Math.abs(y)>100000||(vertexAnglesDeg&& (vertexAnglesDeg.length!==sides||!vertexAnglesDeg.every(a=>Number.isFinite(a)&&a>0&&a<180))))throw new Error('第'+(i+1)+'个图形参数不符合要求');
+     const regularShape=o.shape!=='菱形';
+     return {id:String(o.id||('shape-'+(i+1))).slice(0,40),shape:o.shape,sides,rotationDeg:((rotationDeg%360)+360)%360,x,y,vertexAnglesDeg,interiorAngleDeg:regularShape?Number(((sides-2)*180/sides).toFixed(2)):null};
    });
    return {dimension:value.dimension==='3d'?'3d':'2d',objects};
  }
