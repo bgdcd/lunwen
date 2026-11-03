@@ -80,4 +80,6 @@ window.TotoAI.updateGeometryState({
 
 也可通过 `window.dispatchEvent(new CustomEvent('toto:geometrychange',{detail: state}))` 同步，或调用 `window.TotoAI.clearGeometryState()` 清空。聊天面板会显示已接收的对象数量。
 
-重要：目前 `index-workbench.html` 的主工作台仍是装饰性 3D 展示 Canvas，不含真实的可拖动多边形编辑对象。因此本次交付的是经过校验的 AI 几何状态接入接口，并非已经完成画布自动读取。要让拓拓读取学生实际拖动的图形，下一步必须把真实几何编辑器的对象数据接到该接口。
+重要：真实的二维自由创作编辑器位于仓库根目录的 `index.html`，现已完成数据桥接，不再只是预留接口。添加图形、拖动图形（拖动过程中实时同步）、旋转、复制、删除、清空、恢复布局和加载示例后，都会自动更新 `window.TotoAI.getGeometryState()`，并广播 `toto:geometrychange` 与 `polylab:geometry-updated` 事件。当前 `index-workbench.html` 的 `benchCanvas` 仍是独立的装饰性 3D 展示画布，不会被误报为可编辑模型。
+
+注意两个页面目前仍是独立入口：`index.html` 中的本地拓拓可使用其内置几何检测引擎；`index-workbench.html` 中的云端 Worker 聊天读取其自身页面收到的几何状态。此提交已让真实编辑器持续输出标准化状态事件，但没有声称两个独立页面之间已经自动跨页传输，也没有声称豆包后端已部署。若要让云端 Worker 直接回答 `index.html` 当前作品的状态，需要下一步把该页面的聊天请求接到同一 Worker，或建立明确的同源消息桥接。
