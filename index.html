@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="theme-color" content="#e8f3f3" />
+<title>立体密铺实验室 · POLYLAB V7 · IMMERSIVE ROOM</title>
+<style>
+:root{--bg:#080c1d;--panel:#111a32;--panel2:#172342;--line:rgba(139,170,255,.2);--cyan:#63e8ff;--blue:#6e93ff;--gold:#f3c879;--pink:#f08fae;--text:#eaf1ff;--muted:#91a2c5;--good:#6de6bf;--shadow:0 18px 60px rgba(0,0,0,.38)}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:radial-gradient(ellipse at 25% 15%,#172855 0%,#0b1229 38%,#070a17 100%);color:var(--text);font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif}button,input{font:inherit}button{cursor:pointer;color:inherit;border:0}.app{height:100%;min-height:620px;display:flex;flex-direction:column;position:relative;isolation:isolate}.app:before{content:"";position:absolute;inset:0;pointer-events:none;z-index:-1;background-image:linear-gradient(rgba(96,139,237,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(96,139,237,.045) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,black,transparent 90%)}
+.topbar{height:68px;flex:0 0 68px;display:flex;align-items:center;gap:18px;padding:0 24px;border-bottom:1px solid rgba(142,177,255,.16);background:rgba(6,10,25,.65);backdrop-filter:blur(18px);z-index:5}.brand{display:flex;align-items:center;gap:12px;min-width:260px}.brand-mark{width:38px;height:38px;border-radius:12px;position:relative;background:linear-gradient(140deg,#5ce7ff,#6676ff 56%,#bc83ff);box-shadow:0 0 24px rgba(94,187,255,.32);display:grid;place-items:center}.brand-mark:before{content:"";width:17px;height:17px;border:2px solid #061328;transform:rotate(45deg);border-radius:3px}.brand-title{font-weight:800;font-size:16px;letter-spacing:1.3px}.brand-sub{font-size:9px;letter-spacing:2.2px;color:#8ba4dc;margin-top:2px}.top-center{display:flex;align-items:center;gap:9px;color:#aab9dc;font-size:12px}.top-center .spark{color:var(--cyan);font-size:18px}.top-actions{margin-left:auto;display:flex;align-items:center;gap:9px}.tag{border:1px solid rgba(93,220,255,.25);border-radius:30px;padding:7px 12px;color:#9ceeff;font-size:11px;background:rgba(42,147,190,.08)}.top-btn{padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.035);font-size:12px;color:#c5d3f4;transition:.2s}.top-btn:hover{border-color:rgba(99,232,255,.55);color:white;background:rgba(76,173,217,.12)}
+.main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(500px,1fr) 340px;gap:15px;padding:15px 17px 16px}.workspace{min-width:0;min-height:0;display:flex;flex-direction:column;gap:12px}.scene-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:0 3px}.scene-kicker{font-size:10px;letter-spacing:2.5px;color:var(--cyan);font-weight:700}.scene-title{font-size:22px;font-weight:800;letter-spacing:.6px;margin-top:4px}.scene-desc{font-size:11px;color:var(--muted);margin-top:5px}.scene-metrics{display:flex;gap:7px;align-items:center;padding-bottom:3px}.metric{background:rgba(19,35,69,.68);border:1px solid rgba(115,160,255,.16);border-radius:9px;padding:7px 11px;min-width:80px}.metric b{font-size:14px;color:#f5d48f;display:block}.metric span{font-size:9px;color:#8fa5d0}
+.stage-wrap{position:relative;flex:1;min-height:300px;overflow:hidden;border-radius:18px;border:1px solid rgba(124,162,255,.23);background:radial-gradient(ellipse at 50% 55%,rgba(35,73,128,.35),rgba(12,20,45,.8) 58%,rgba(7,12,28,.94));box-shadow:var(--shadow)}.stage-wrap:before{content:"";position:absolute;inset:0;background:linear-gradient(115deg,rgba(93,222,255,.08),transparent 34%,transparent 70%,rgba(162,113,255,.08));pointer-events:none;z-index:1}.stage-wrap:after{content:"";position:absolute;left:50%;top:47%;width:58%;height:56%;transform:translate(-50%,-50%);border:1px solid rgba(96,169,255,.13);border-radius:50%;box-shadow:0 0 45px rgba(52,139,255,.08),inset 0 0 50px rgba(52,139,255,.05);pointer-events:none}.stage-canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab}.stage-canvas:active{cursor:grabbing}.stage-hud{position:absolute;z-index:2;pointer-events:none;font-size:10px;color:#91addc;letter-spacing:1px}.hud-left{left:17px;top:14px}.hud-right{right:17px;top:14px;text-align:right}.hud-bottom{left:17px;bottom:14px}.axis{display:inline-block;width:7px;height:7px;border-radius:50%;background:#63e8ff;margin-right:7px;box-shadow:0 0 10px #63e8ff}.stage-controls{position:absolute;right:14px;bottom:13px;display:flex;gap:6px;z-index:4}.icon-btn{width:34px;height:34px;border-radius:10px;background:rgba(11,20,43,.82);border:1px solid rgba(119,162,255,.25);color:#b8d4ff;font-size:16px;backdrop-filter:blur(8px)}.icon-btn:hover{border-color:var(--cyan);color:white}.toast{position:absolute;left:50%;top:18px;transform:translateX(-50%);z-index:8;background:rgba(17,39,73,.95);border:1px solid rgba(99,232,255,.45);border-radius:30px;padding:8px 15px;font-size:11px;color:#c7f5ff;opacity:0;pointer-events:none;transition:.25s}.toast.show{opacity:1;top:28px}
+.toolbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:9px 10px;border:1px solid rgba(125,161,246,.16);border-radius:13px;background:rgba(14,24,49,.82)}.tool-label{font-size:10px;letter-spacing:1px;color:#91a7d3;padding:0 7px}.tool-btn{font-size:11px;padding:8px 11px;border-radius:8px;background:rgba(255,255,255,.045);border:1px solid rgba(130,163,239,.15);color:#c4d2f2;transition:.2s}.tool-btn:hover,.tool-btn.active{background:rgba(73,177,218,.14);border-color:rgba(99,232,255,.45);color:#e6fbff}.tool-btn.primary{background:linear-gradient(110deg,rgba(48,155,202,.32),rgba(108,105,226,.28));border-color:rgba(96,221,255,.42);color:#dcf8ff}.tool-spacer{flex:1}.hint{font-size:10px;color:#7e93bc;margin-left:4px}
+.mode-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.mode-card{position:relative;min-width:0;display:flex;align-items:center;gap:10px;text-align:left;padding:11px 12px;border-radius:13px;background:linear-gradient(125deg,rgba(23,38,72,.95),rgba(13,22,44,.94));border:1px solid rgba(123,158,239,.18);transition:.22s;overflow:hidden}.mode-card:after{content:"";position:absolute;right:-20px;top:-32px;width:80px;height:80px;border-radius:50%;background:rgba(82,190,255,.08);filter:blur(12px)}.mode-card:hover{transform:translateY(-2px);border-color:rgba(99,232,255,.45)}.mode-card.selected{border-color:rgba(99,232,255,.72);box-shadow:inset 0 0 0 1px rgba(99,232,255,.13),0 0 22px rgba(50,165,224,.1);background:linear-gradient(125deg,rgba(30,64,103,.95),rgba(23,34,75,.95))}.mode-number{font-size:9px;letter-spacing:1px;color:#7f9acb}.mode-icon{width:37px;height:37px;flex:0 0 37px;border-radius:11px;display:grid;place-items:center;background:rgba(89,170,220,.11);border:1px solid rgba(102,209,255,.22);font-size:19px}.mode-name{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mode-sub{font-size:9px;color:#8da2ca;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.agent{min-width:0;min-height:0;border:1px solid rgba(135,162,246,.22);border-radius:18px;background:linear-gradient(160deg,rgba(21,34,66,.96),rgba(10,17,37,.98));box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden;position:relative}.agent:before{content:"";position:absolute;top:-100px;left:0;right:0;height:240px;background:radial-gradient(ellipse,rgba(47,154,210,.18),transparent 70%);pointer-events:none}.agent-head{position:relative;z-index:1;padding:15px 15px 12px;border-bottom:1px solid rgba(130,159,234,.15)}.agent-profile{display:flex;gap:11px;align-items:center}.avatar{width:56px;height:56px;flex:0 0 56px;position:relative;display:grid;place-items:center}.avatar-core{width:38px;height:38px;border-radius:14px;position:relative;transform:rotate(-8deg);background:linear-gradient(140deg,#78f2ff,#6289ff 60%,#a88cff);box-shadow:0 0 25px rgba(98,198,255,.55),inset -5px -6px 10px rgba(28,48,126,.4);animation:float 3.6s ease-in-out infinite}.avatar-core:before{content:"";position:absolute;left:9px;top:13px;width:5px;height:7px;background:#10234c;border-radius:50%;box-shadow:14px 0 #10234c}.avatar-core:after{content:"";position:absolute;left:13px;top:25px;width:12px;height:5px;border-bottom:2px solid #10234c;border-radius:50%}.orbit{position:absolute;inset:3px;border:1px solid rgba(100,225,255,.5);border-radius:50%;transform:rotateX(68deg) rotateZ(-30deg);animation:orbit 6s linear infinite}.orbit.two{inset:0 8px;border-color:rgba(177,137,255,.48);transform:rotateY(65deg) rotateZ(25deg);animation-duration:8s}.avatar-dot{position:absolute;width:6px;height:6px;right:3px;top:7px;border-radius:50%;background:#b5faff;box-shadow:0 0 9px #65f4ff}.agent-name{font-size:15px;font-weight:800;letter-spacing:.5px}.agent-role{font-size:10px;color:#9fb1d9;margin-top:4px}.online{display:flex;align-items:center;gap:5px;font-size:9px;color:#75e6c3;margin-top:6px}.online:before{content:"";width:6px;height:6px;border-radius:50%;background:#68e4b6;box-shadow:0 0 8px #68e4b6}.agent-intro{margin-top:12px;background:rgba(71,120,178,.1);border:1px solid rgba(107,172,224,.14);border-radius:10px;padding:9px 10px;font-size:10px;line-height:1.7;color:#b9c9e9}.agent-intro b{color:#e5f8ff}.chat-log{flex:1;min-height:0;overflow:auto;padding:14px 12px 8px;display:flex;flex-direction:column;gap:11px;scrollbar-width:thin;scrollbar-color:#314b77 transparent}.msg{max-width:94%;display:flex;flex-direction:column;gap:4px;animation:appear .22s ease-out}.msg.user{align-self:flex-end;align-items:flex-end}.msg.bot{align-self:flex-start}.msg-label{font-size:9px;color:#8299c6;padding:0 4px}.bubble{padding:10px 11px;border-radius:12px;font-size:11px;line-height:1.75;white-space:pre-wrap}.bot .bubble{background:rgba(53,87,142,.23);border:1px solid rgba(122,170,235,.16);border-top-left-radius:4px;color:#d9e6ff}.user .bubble{background:linear-gradient(120deg,rgba(56,143,184,.34),rgba(92,101,196,.32));border:1px solid rgba(100,208,237,.22);border-top-right-radius:4px;color:#effaff}.bubble strong{color:#fff}.bubble .math{display:block;color:#8deaff;background:rgba(5,12,29,.36);padding:5px 7px;border-radius:7px;margin:5px 0;font-weight:700}.quick-asks{padding:8px 11px 9px;display:flex;flex-wrap:wrap;gap:6px;border-top:1px solid rgba(130,159,234,.11)}.quick{font-size:9px;border-radius:20px;padding:6px 8px;background:rgba(91,130,191,.1);border:1px solid rgba(117,171,232,.2);color:#acc8f2}.quick:hover{border-color:var(--cyan);color:white}.chat-entry{padding:9px 11px 12px;display:flex;gap:7px}.chat-input{min-width:0;flex:1;background:rgba(5,11,27,.65);border:1px solid rgba(130,163,238,.2);border-radius:10px;padding:10px 11px;color:#ecf5ff;outline:none;font-size:11px}.chat-input:focus{border-color:rgba(99,232,255,.55);box-shadow:0 0 0 2px rgba(99,232,255,.08)}.send{width:40px;border-radius:10px;background:linear-gradient(135deg,#4fcde9,#6573e9);color:#071329;font-size:17px;font-weight:800;box-shadow:0 4px 16px rgba(75,169,233,.24)}.agent-foot{font-size:9px;color:#7186b1;text-align:center;padding:0 10px 10px}.agent-foot span{color:#9bc9ec}
+.modal{position:fixed;inset:0;z-index:30;background:rgba(3,7,18,.78);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;padding:24px}.modal.open{display:flex}.modal-card{width:min(820px,96vw);max-height:90vh;overflow:auto;border:1px solid rgba(125,171,255,.3);border-radius:18px;background:linear-gradient(145deg,#172849,#0d1730);padding:20px;box-shadow:0 30px 100px rgba(0,0,0,.55)}.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}.modal-title{font-size:18px;font-weight:800}.close{background:rgba(255,255,255,.08);border:1px solid var(--line);border-radius:8px;padding:6px 11px}.reference-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.reference-card{border:1px solid var(--line);border-radius:13px;padding:10px;background:rgba(4,10,25,.38)}.reference-card img{width:100%;height:250px;object-fit:contain;background:#f4f0e6;border-radius:8px}.reference-card h3{font-size:12px;margin:10px 0 4px}.reference-card p{font-size:10px;color:#aabbdc;line-height:1.65;margin:0}.help-text{font-size:12px;line-height:1.8;color:#c4d3f0}.help-text h3{font-size:13px;color:#fff;margin:15px 0 5px}.help-text code{color:#9ceeff;background:#071326;padding:2px 5px;border-radius:4px}.disclaimer{font-size:10px;color:#879ac1;line-height:1.7;margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-8deg)}50%{transform:translateY(-5px) rotate(2deg)}}@keyframes orbit{to{transform:rotateX(68deg) rotateZ(330deg)}}@keyframes appear{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media(max-width:1120px){.main{grid-template-columns:minmax(430px,1fr) 310px;gap:10px;padding:10px}.topbar{padding:0 14px}.brand{min-width:220px}.metric{min-width:65px;padding:6px 8px}.metric span{font-size:8px}.scene-title{font-size:19px}}
+@media(max-width:850px){html,body{overflow:auto}.app{height:auto;min-height:100%;overflow:visible}.topbar{height:60px;flex-basis:60px}.top-center{display:none}.main{display:flex;flex-direction:column;overflow:visible}.stage-wrap{height:440px;flex:0 0 440px}.agent{height:580px;flex:0 0 580px}.mode-card{padding:9px 8px;gap:7px}.mode-icon{width:30px;height:30px;flex-basis:30px;font-size:15px}.mode-name{font-size:10px}.mode-sub{font-size:8px}.scene-metrics{display:none}}
+@media(max-width:560px){.brand{min-width:auto}.brand-title{font-size:13px}.brand-sub{font-size:8px}.tag{display:none}.stage-wrap{height:360px;flex-basis:360px}.mode-row{gap:5px}.mode-card{display:block;padding:8px 7px}.mode-icon{margin-bottom:6px}.mode-name{white-space:normal;line-height:1.3}.scene-title{font-size:17px}.scene-desc{max-width:250px;line-height:1.5}.toolbar{gap:5px}.tool-btn{padding:7px 8px;font-size:10px}.hint{display:none}.reference-grid{grid-template-columns:1fr}.reference-card img{height:210px}}
+
+/* ===== 自由创作工作台 V2 ===== */
+.studio-modal{padding:14px;z-index:60}
+.studio-card{width:min(1320px,98vw);height:min(900px,96vh);display:grid;grid-template-columns:248px minmax(0,1fr);grid-template-rows:62px minmax(0,1fr);overflow:hidden;border:1px solid rgba(105,218,255,.34);border-radius:20px;background:linear-gradient(145deg,#142747 0%,#0b142b 58%,#090f22 100%);box-shadow:0 32px 120px rgba(0,0,0,.65)}
+.studio-head{grid-column:1/-1;display:flex;align-items:center;gap:12px;padding:0 19px;border-bottom:1px solid rgba(133,174,255,.18);background:rgba(5,12,28,.56)}
+.studio-head strong{font-size:16px;letter-spacing:.7px}.studio-head small{font-size:10px;color:#8fa8d7;letter-spacing:1.2px}.studio-head .close{margin-left:auto}
+.studio-side{min-height:0;overflow:auto;padding:14px;border-right:1px solid rgba(133,174,255,.16);background:rgba(8,17,37,.48)}
+.studio-section-title{font-size:11px;font-weight:800;letter-spacing:1px;color:#bfeeff;margin:3px 0 10px}
+.studio-subtitle{font-size:10px;color:#8ea4cf;line-height:1.6;margin:-4px 0 11px}
+.studio-shapes{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.studio-shape{min-height:65px;border-radius:10px;border:1px solid rgba(122,160,239,.2);background:rgba(255,255,255,.04);color:#dceaff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11px;transition:.18s}
+.studio-shape:hover{border-color:rgba(99,232,255,.65);background:rgba(68,171,220,.13);transform:translateY(-1px)}
+.studio-shape .shape-glyph{font-size:23px;line-height:1;color:#a8eaff;text-shadow:0 0 14px rgba(99,232,255,.25)}
+.studio-ops{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:9px}
+.studio-op{padding:9px 6px;border:1px solid rgba(128,166,240,.2);border-radius:9px;background:rgba(255,255,255,.045);font-size:10px;color:#c9d9f7}
+.studio-op:hover{border-color:rgba(99,232,255,.55);color:#fff}
+.studio-op.danger:hover{border-color:rgba(255,128,145,.65);color:#ffc0cb}
+.studio-separator{height:1px;background:rgba(137,170,243,.14);margin:15px 0}
+.angle-select-row{display:flex;gap:6px;align-items:center}
+.angle-select-row select{min-width:0;flex:1;background:#0b1730;color:#dceaff;border:1px solid rgba(137,170,243,.25);border-radius:8px;padding:8px 7px;font-size:10px}
+.angle-select-row button{padding:8px 10px}
+.angle-chips{display:flex;flex-wrap:wrap;gap:5px;min-height:30px;margin:9px 0}
+.angle-chip{font-size:10px;border:1px solid rgba(99,232,255,.26);background:rgba(70,160,205,.12);color:#d8f8ff;border-radius:20px;padding:5px 8px}
+.angle-chip button{background:none;color:#8ca6ca;margin-left:4px;padding:0;font-size:12px}
+.angle-result{border:1px solid rgba(133,170,243,.2);border-radius:11px;background:rgba(5,13,30,.45);padding:10px;margin-top:9px}
+.angle-total{display:flex;align-items:baseline;gap:5px}.angle-total b{font-size:25px;color:#f6d78e}.angle-total span{font-size:10px;color:#92a8d2}
+.angle-status{font-size:10px;line-height:1.65;margin-top:5px;color:#b8c9e8}
+.angle-status.good{color:#7ae7c4}.angle-status.warn{color:#ffcc85}.angle-status.bad{color:#ff9cac}
+.angle-presets{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.angle-presets button{font-size:9px;padding:6px 7px;border-radius:7px;background:rgba(255,255,255,.045);border:1px solid rgba(133,170,243,.16);color:#aebfe3}
+.studio-main{min-width:0;min-height:0;display:flex;flex-direction:column;padding:13px;gap:9px}
+.studio-toolbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.studio-toolbar button{padding:8px 11px;border:1px solid rgba(128,166,240,.2);border-radius:8px;background:rgba(255,255,255,.045);font-size:10px;color:#d0def8}
+.studio-toolbar button:hover{border-color:rgba(99,232,255,.55);color:#fff}
+.studio-toolbar .studio-primary{background:linear-gradient(110deg,rgba(48,155,202,.3),rgba(108,105,226,.25));border-color:rgba(96,221,255,.4);color:#e2faff}
+.studio-toolbar .studio-spacer{flex:1}
+.studio-info{font-size:10px;color:#8fa6d2;white-space:nowrap}
+.creator-board-wrap{position:relative;min-height:0;flex:1;border:1px solid rgba(108,170,255,.24);border-radius:14px;overflow:hidden;background:radial-gradient(ellipse at 48% 42%,rgba(31,62,111,.28),rgba(5,13,30,.88) 76%)}
+#creatorBoard{width:100%;height:100%;display:block;touch-action:none;cursor:crosshair}
+.creator-board-note{position:absolute;left:13px;bottom:10px;pointer-events:none;font-size:9px;color:#819ac7;letter-spacing:.5px}
+.creator-status{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:10px;color:#92a8d2}
+.creator-status b{color:#d8e8ff;font-weight:700}.creator-status .status-dot{width:6px;height:6px;border-radius:50%;background:#69e4be;box-shadow:0 0 8px #69e4be;display:inline-block;margin-right:5px}
+.tile-shape{cursor:grab}.tile-shape:active{cursor:grabbing}.tile-shape polygon{stroke:#f2e0a8;stroke-width:2.1;vector-effect:non-scaling-stroke;transition:stroke .12s}.tile-shape.selected polygon{stroke:#75efff;stroke-width:4;filter:drop-shadow(0 0 7px rgba(99,232,255,.65))}.tile-shape text{font-size:10px;fill:#14213d;font-weight:800;pointer-events:none;text-anchor:middle;dominant-baseline:middle}
+@media(max-width:850px){.studio-modal{padding:5px}.studio-card{width:100%;height:100%;grid-template-columns:190px minmax(0,1fr);grid-template-rows:54px minmax(0,1fr);border-radius:12px}.studio-side{padding:10px}.studio-main{padding:9px}.studio-head{padding:0 12px}}
+@media(max-width:600px){.studio-card{grid-template-columns:1fr;grid-template-rows:52px auto minmax(260px,1fr);overflow:auto}.studio-head{grid-row:1}.studio-side{grid-row:2;border-right:0;border-bottom:1px solid rgba(133,174,255,.16);max-height:34vh}.studio-main{grid-row:3;min-height:320px}.studio-shapes{grid-template-columns:repeat(5,minmax(0,1fr))}.studio-shape{min-height:54px}.studio-shape .shape-glyph{font-size:19px}.studio-ops{grid-template-columns:repeat(4,1fr)}.studio-op{font-size:9px;padding:8px 3px}.angle-result{padding:7px}.angle-total b{font-size:20px}}
+
+
+/* ===== V3 几何验证引擎 ===== */
+#geometryReport{display:none;flex:0 0 auto;border:1px solid rgba(104,218,255,.25);border-radius:12px;padding:10px 12px;background:linear-gradient(110deg,rgba(20,48,83,.72),rgba(13,22,48,.84));color:#d8e8ff;max-height:132px;overflow:auto}
+#geometryReport.show{display:block;animation:appear .18s ease-out}
+.geometry-head{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:800;color:#bcefff;margin-bottom:6px}
+.geometry-head .geometry-pill{margin-left:auto;font-size:9px;padding:3px 8px;border-radius:20px;border:1px solid rgba(112,166,240,.28);color:#a9c8f4;font-weight:600}
+.geometry-summary{font-size:10px;line-height:1.65;color:#c7d8f5}
+.geometry-summary strong{color:#fff}
+.geometry-detail{font-size:9px;line-height:1.6;color:#91a9d3;margin-top:3px}
+.tile-shape.overlap polygon{stroke:#ff6e8b!important;stroke-width:4!important;filter:drop-shadow(0 0 8px rgba(255,75,110,.7))}
+#geometryMarks{pointer-events:none}
+.geometry-mark-gap{fill:#ffbf68;stroke:#fff0c7;stroke-width:1.4}
+.geometry-mark-over{fill:#ff6380;stroke:#ffe0e7;stroke-width:1.4}
+.geometry-mark-text{font: bold 10px 'Microsoft YaHei',sans-serif;fill:#fff;text-anchor:middle;paint-order:stroke;stroke:#09152d;stroke-width:3px;stroke-linejoin:round}
+@media(max-width:600px){#geometryReport{max-height:110px}.geometry-summary{font-size:9px}}
+
+
+
+/* ===== V4 空间实验室：把原来的展示区域改造成可进入的实体房间 ===== */
+.stage-wrap.room-stage{
+  isolation:isolate;border-radius:15px;overflow:hidden;border:1px solid rgba(133,193,231,.34);
+  background:linear-gradient(180deg,#101b32 0%,#0d1b2f 52%,#101c2b 100%);
+  box-shadow:inset 0 0 0 5px rgba(4,10,22,.38),inset 0 0 60px rgba(30,108,147,.12),0 24px 65px rgba(0,0,0,.48)
+}
+.stage-wrap.room-stage:before{z-index:5;background:linear-gradient(115deg,rgba(93,222,255,.025),transparent 32%,transparent 72%,rgba(162,113,255,.035));}
+.stage-wrap.room-stage:after{display:none}
+.room-shell{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;background:linear-gradient(180deg,#101b31 0%,#15243a 48%,#0e1728 100%)}
+.room-ceiling{position:absolute;left:8%;right:8%;top:0;height:20%;clip-path:polygon(0 0,100% 0,88% 100%,12% 100%);background:linear-gradient(180deg,#26364d 0%,#17263d 72%,#111e32 100%);border-bottom:1px solid rgba(128,215,244,.3);box-shadow:inset 0 -15px 20px rgba(0,0,0,.22)}
+.room-ceiling:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 18%,rgba(135,190,216,.1) 18.2% 18.5%,transparent 18.8% 36%);opacity:.6}
+.room-ceiling i{position:absolute;top:21%;height:4px;width:16%;border-radius:8px;background:linear-gradient(90deg,transparent,#8beeff,#e1fbff,#8beeff,transparent);box-shadow:0 0 13px rgba(109,226,255,.62)}
+.room-ceiling i:nth-child(1){left:17%}.room-ceiling i:nth-child(2){left:42%;width:19%}.room-ceiling i:nth-child(3){right:15%}
+.room-back-wall{position:absolute;left:11%;right:11%;top:12%;height:51%;background:linear-gradient(180deg,#253950 0%,#1a2b42 65%,#152438 100%);border:1px solid rgba(151,204,225,.25);box-shadow:inset 0 0 38px rgba(0,0,0,.35),0 10px 28px rgba(0,0,0,.22)}
+.room-back-wall:before{content:"";position:absolute;left:0;right:0;top:0;height:7px;background:linear-gradient(90deg,#56728c,#a2c9d8 20%,#3b617e 50%,#a2c9d8 80%,#56728c);opacity:.5}
+.room-window{position:absolute;left:25%;top:15%;width:49%;height:49%;overflow:hidden;border:5px solid #435d73;border-bottom-width:8px;background:linear-gradient(180deg,#142a48 0%,#1c4b69 52%,#142e45 100%);box-shadow:inset 0 0 26px rgba(100,217,255,.22),0 0 18px rgba(89,197,239,.1)}
+.room-window:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 18% 24%,rgba(231,250,255,.85) 0 1px,transparent 2px),radial-gradient(circle at 78% 31%,rgba(231,250,255,.6) 0 1px,transparent 2px),radial-gradient(circle at 53% 68%,rgba(231,250,255,.55) 0 1px,transparent 2px),linear-gradient(140deg,transparent 35%,rgba(93,204,239,.13) 36%,transparent 65%)}
+.window-grid{position:absolute;inset:0;background:linear-gradient(90deg,transparent 32.8%,rgba(185,223,237,.33) 33%,rgba(185,223,237,.33) 33.5%,transparent 33.7%,transparent 66%,rgba(185,223,237,.33) 66.3%,transparent 66.7%),linear-gradient(180deg,transparent 48%,rgba(185,223,237,.22) 48.5%,transparent 49%)}
+.window-horizon{position:absolute;left:0;right:0;bottom:0;height:24%;background:linear-gradient(180deg,transparent,rgba(67,169,195,.12)),repeating-linear-gradient(90deg,rgba(64,163,191,.16) 0 2px,transparent 2px 30px)}
+.wall-title{position:absolute;left:4%;top:16%;font-size:clamp(13px,1.7vw,22px);font-weight:900;letter-spacing:3px;color:#c0e7f0;text-shadow:0 0 15px rgba(102,219,245,.25)}
+.wall-title small{display:block;margin-top:6px;font-size:8px;letter-spacing:2px;color:#82aebe;font-weight:600}
+.wall-status{position:absolute;right:4%;top:17%;display:flex;flex-direction:column;gap:5px;font-size:8px;color:#95bdce;letter-spacing:1px}
+.wall-status b{font-size:11px;color:#d2edf1}.wall-status i{display:block;width:54px;height:3px;border-radius:4px;background:linear-gradient(90deg,#56d9e9 0 58%,rgba(105,150,177,.2) 58%);margin-top:2px}
+.wall-shelf{position:absolute;left:4%;right:4%;bottom:8%;height:5px;background:linear-gradient(90deg,#455d70,#a4c4d0 50%,#455d70);box-shadow:0 6px 12px rgba(0,0,0,.34)}
+.wall-shelf i{position:relative;display:inline-block;width:9%;height:20px;margin:0 2.4%;top:-19px;border-radius:3px 3px 0 0;background:linear-gradient(90deg,#385e75,#83aebd,#2b4c66);opacity:.75}
+.room-left-wall,.room-right-wall{position:absolute;top:10%;bottom:11%;width:24%;background:linear-gradient(120deg,#24384d,#142438 75%);border:1px solid rgba(126,189,217,.16);box-shadow:inset 0 0 32px rgba(0,0,0,.38)}
+.room-left-wall{left:-1%;clip-path:polygon(0 0,100% 12%,100% 91%,0 100%)}
+.room-right-wall{right:-1%;clip-path:polygon(0 12%,100% 0,100% 100%,0 91%);background:linear-gradient(240deg,#293b51,#142337 75%)}
+.wall-console{position:absolute;left:13%;top:25%;width:65%;height:47%;padding:9px 8px;border:1px solid rgba(120,201,224,.32);background:linear-gradient(150deg,rgba(7,23,39,.8),rgba(27,61,78,.72));box-shadow:0 8px 20px rgba(0,0,0,.3);transform:skewY(4deg)}
+.wall-console b{display:block;font-size:9px;color:#b8dce7;letter-spacing:1px}.console-lights{display:flex;gap:5px;margin:8px 0}.console-lights i,.right-wall-lights i{width:5px;height:5px;border-radius:50%;background:#69e2d2;box-shadow:0 0 7px #69e2d2}.wall-console em{display:block;height:3px;margin:5px 0;background:linear-gradient(90deg,rgba(92,222,231,.65) 0 36%,rgba(121,159,178,.16) 36%);border-radius:5px}.console-screen{height:32%;margin-top:8px;border:1px solid rgba(114,205,224,.3);background:linear-gradient(135deg,rgba(43,120,144,.25),rgba(13,28,50,.7));position:relative}.console-screen:after{content:"∠ 360°   ⬡  □";position:absolute;left:6px;top:5px;color:#8be7eb;font-size:8px;letter-spacing:1px}
+.wall-ribs{position:absolute;right:7%;top:10%;bottom:12%;width:2px;background:rgba(130,187,207,.22);box-shadow:-9px 0 rgba(130,187,207,.08),-18px 0 rgba(130,187,207,.06)}
+.room-door{position:absolute;right:13%;top:22%;width:48%;height:57%;border:4px solid #4a657b;border-bottom-width:7px;background:linear-gradient(90deg,#152940,#263f58 18%,#162a42 83%,#0d1d31);box-shadow:inset 0 0 20px rgba(0,0,0,.4)}
+.room-door:before{content:"";position:absolute;left:10%;right:10%;top:9%;bottom:8%;border:1px solid rgba(114,199,219,.3);background:linear-gradient(135deg,rgba(75,143,168,.13),transparent)}
+.room-door span{position:absolute;left:12%;top:13%;font-size:7px;letter-spacing:1px;color:#9fc8d6}.room-door i{position:absolute;right:9%;top:55%;width:4px;height:4px;background:#7fe4ec;border-radius:50%;box-shadow:0 0 7px #7fe4ec}
+.right-wall-lights{position:absolute;left:8%;top:28%;display:flex;gap:7px}.right-wall-lights i{background:#8bcaff;box-shadow:0 0 7px #8bcaff}
+.room-floor{position:absolute;left:0;right:0;bottom:0;height:47%;clip-path:polygon(0 0,100% 0,86% 100%,14% 100%);background:linear-gradient(180deg,#1c3144 0%,#101c2d 100%);border-top:1px solid rgba(140,211,230,.35);overflow:hidden}
+.room-floor:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(84,180,206,.12),transparent 40%),repeating-linear-gradient(90deg,rgba(142,191,211,.13) 0 1px,transparent 1px 12.5%),repeating-linear-gradient(0deg,rgba(142,191,211,.12) 0 1px,transparent 1px 18%);transform:perspective(260px) rotateX(12deg) scale(1.08);transform-origin:top center;mask-image:linear-gradient(180deg,rgba(0,0,0,.7),transparent 90%)}
+.floor-grid{position:absolute;left:31%;right:31%;top:15%;bottom:0;border-left:1px solid rgba(114,205,220,.2);border-right:1px solid rgba(114,205,220,.2);background:repeating-linear-gradient(90deg,transparent 0 24%,rgba(129,195,216,.14) 24.2% 24.6%,transparent 25% 49%);opacity:.42;transform:perspective(160px) rotateX(8deg)}
+.floor-light{position:absolute;bottom:9%;width:17%;height:3px;border-radius:50%;background:#75dded;box-shadow:0 0 14px 3px rgba(96,220,238,.4)}.light-a{left:22%}.light-b{right:22%}
+.room-floor-edge{position:absolute;left:7%;right:7%;bottom:0;height:9%;border-top:1px solid rgba(118,207,229,.32);background:linear-gradient(180deg,rgba(45,71,91,.8),rgba(9,18,31,.95));clip-path:polygon(8% 0,92% 0,100% 100%,0 100%)}
+.lab-podium{position:absolute;left:50%;bottom:7%;width:50%;height:16%;transform:translateX(-50%);z-index:1;pointer-events:none;filter:drop-shadow(0 20px 14px rgba(0,0,0,.48))}
+.lab-podium:before{content:"";position:absolute;left:7%;right:7%;top:14%;height:82%;border:1px solid rgba(112,214,233,.33);border-top:0;border-radius:0 0 50% 50% / 0 0 28% 28%;background:linear-gradient(180deg,#304d62 0%,#172c40 45%,#0d1a2a 100%);box-shadow:inset 0 -10px 18px rgba(0,0,0,.42),inset 0 10px 15px rgba(132,217,233,.12)}
+.podium-top{position:absolute;left:0;right:0;top:0;height:35%;border-radius:50%;border:2px solid rgba(142,224,239,.64);background:radial-gradient(ellipse at 50% 42%,rgba(97,181,203,.38),rgba(28,55,76,.92) 68%);box-shadow:0 0 18px rgba(84,204,225,.18),inset 0 3px 8px rgba(218,251,255,.25)}
+.podium-ring{position:absolute;left:4%;right:4%;top:28%;height:22%;border-radius:50%;border:1px solid rgba(104,228,235,.5);box-shadow:0 0 10px rgba(89,223,235,.3)}
+.stage-canvas{z-index:2;background:transparent}
+.stage-hud{z-index:6;text-shadow:0 2px 6px rgba(0,0,0,.8)}
+.stage-controls{z-index:7}
+.toast{z-index:9}
+/* 工作台也作为房间中的实体操作设备，而非单独漂浮的白板 */
+.studio-card{background:linear-gradient(180deg,#1b2d44 0%,#111f32 58%,#0b1627 100%);box-shadow:0 32px 120px rgba(0,0,0,.72),inset 0 0 0 5px rgba(4,10,20,.26)}
+.studio-main{position:relative;isolation:isolate;background:linear-gradient(180deg,rgba(28,48,67,.95) 0%,rgba(23,39,55,.96) 57%,rgba(13,25,39,.98) 57.5%,rgba(10,20,32,.98) 100%)}
+.studio-main:before{content:"";position:absolute;z-index:-1;left:0;right:0;top:0;height:58%;background:linear-gradient(90deg,transparent 0 8%,rgba(128,188,203,.08) 8.2% 8.5%,transparent 8.7% 91%,rgba(128,188,203,.08) 91.2% 91.5%,transparent 91.7%),linear-gradient(180deg,rgba(128,199,216,.09),transparent 65%);border-bottom:4px solid rgba(93,144,168,.2)}
+.studio-main:after{content:"";position:absolute;z-index:-1;left:0;right:0;bottom:0;height:42%;background:repeating-linear-gradient(90deg,rgba(128,177,193,.08) 0 1px,transparent 1px 16%),repeating-linear-gradient(0deg,rgba(128,177,193,.07) 0 1px,transparent 1px 22%);clip-path:polygon(0 0,100% 0,88% 100%,12% 100%)}
+.creator-board-wrap{border:8px solid #3c596c;border-bottom-width:13px;border-radius:9px;background:linear-gradient(145deg,#273d50,#102337);box-shadow:0 18px 0 -7px #152b3c,0 24px 28px rgba(0,0,0,.42),inset 0 0 0 2px rgba(168,220,231,.22),inset 0 0 28px rgba(4,14,28,.6)}
+.creator-board-wrap:before{content:"";position:absolute;z-index:2;left:0;right:0;top:0;height:7px;background:linear-gradient(90deg,#6d8996,#c4d7d8 48%,#6d8996);opacity:.65;pointer-events:none}
+#creatorBoard{position:relative;z-index:1;background:linear-gradient(145deg,rgba(10,24,42,.18),rgba(7,18,32,.4));cursor:grab}
+#creatorBoard:active{cursor:grabbing}
+.creator-board-note{z-index:3;left:17px;bottom:13px;color:#a9c8d5;text-shadow:0 1px 4px #071321}
+@media(max-width:850px){.room-left-wall,.room-right-wall{width:21%}.room-window{left:23%;width:54%}.lab-podium{width:62%}.room-status{display:none}}
+@media(max-width:560px){.room-ceiling{height:15%}.room-back-wall{top:10%;height:52%;left:8%;right:8%}.room-left-wall,.room-right-wall{width:15%}.wall-console{display:none}.wall-title{left:5%;font-size:10px}.wall-title small{font-size:6px}.room-window{left:27%;width:46%;height:57%}.wall-status{display:none}.room-door{width:65%}.lab-podium{width:72%;bottom:6%;height:14%}.room-floor{height:42%}.creator-board-wrap{border-width:5px;border-bottom-width:9px}}
+
+
+
+/* ===== V5 明亮自然采光的真实科学实验室视觉 ===== */
+:root{
+  --bg:#eef3f6;--panel:#ffffff;--panel2:#f5f8fa;--line:#d9e3e9;
+  --cyan:#29a9c5;--blue:#3978ba;--gold:#c58d3c;--pink:#d97991;
+  --text:#263746;--muted:#6d7e89;--good:#238c73;
+  --shadow:0 12px 32px rgba(38,63,78,.12)
+}
+html,body{background:#edf2f4!important;color:#263746!important}
+body{background:linear-gradient(135deg,#f3f6f7 0%,#e9eff2 52%,#f8f9f7 100%)!important}
+.app:before{opacity:.14;background-image:linear-gradient(rgba(75,115,135,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(75,115,135,.08) 1px,transparent 1px);mask-image:linear-gradient(to bottom,black,transparent 65%)}
+.topbar{background:rgba(255,255,255,.96)!important;border-bottom:1px solid #dce5e9!important;box-shadow:0 3px 14px rgba(45,68,82,.06);backdrop-filter:blur(14px)}
+.brand-mark{background:linear-gradient(145deg,#8bd7d4,#65a9d1 65%,#7f9ad0)!important;box-shadow:0 5px 14px rgba(75,154,174,.2)!important}
+.brand-mark:before{border-color:#fff!important}
+.brand-title{color:#273e4a}.brand-sub{color:#7a98a6!important}
+.top-center{color:#6f8793!important}.top-center .spark{color:#3eafc1!important}
+.tag{color:#397e88!important;border:1px solid #c8e3e3!important;background:#f0f9f8!important}
+.top-btn{background:#fff!important;border:1px solid #d9e3e8!important;color:#536a76!important;box-shadow:0 2px 5px rgba(40,68,82,.04)}
+.top-btn:hover{background:#f0f8fa!important;color:#246c7e!important;border-color:#9acbd2!important}
+.scene-kicker{color:#4b9aa6!important}
+.scene-title{color:#263d49!important}
+.scene-desc{color:#73838c!important}
+.metric{background:#fff!important;border:1px solid #dce6e9!important;box-shadow:0 3px 10px rgba(47,74,87,.05)}
+.metric b{color:#b17d35!important}.metric span{color:#73858f!important}
+
+/* 房间：白色墙面、玻璃窗、自然景观与浅色地面 */
+.stage-wrap.room-stage{
+  border:1px solid #cad9df!important;border-radius:18px!important;
+  background:linear-gradient(180deg,#edf4f5 0%,#f4f5f1 54%,#e9eeeb 100%)!important;
+  box-shadow:0 14px 34px rgba(49,76,88,.16),inset 0 0 0 5px rgba(255,255,255,.56)!important
+}
+.stage-wrap.room-stage:before{z-index:5;background:linear-gradient(110deg,rgba(255,255,255,.24),transparent 38%,transparent 70%,rgba(98,175,190,.05))!important}
+.room-shell{background:linear-gradient(180deg,#f7faf9 0%,#e9f0ef 53%,#e3e9e7 100%)!important}
+.room-ceiling{
+  background:linear-gradient(180deg,#fff 0%,#f2f5f3 78%,#e5ecea 100%)!important;
+  border-bottom:1px solid #d8e2df!important;
+  box-shadow:inset 0 -9px 14px rgba(73,102,108,.06)!important
+}
+.room-ceiling:before{background:repeating-linear-gradient(90deg,transparent 0 18%,rgba(120,151,153,.09) 18.2% 18.5%,transparent 18.8% 36%)!important;opacity:.5}
+.room-ceiling i{height:5px!important;background:linear-gradient(90deg,transparent,#d9f2ee,#fff,#d9f2ee,transparent)!important;box-shadow:0 2px 8px rgba(96,162,166,.18)!important}
+.room-back-wall{
+  background:linear-gradient(180deg,#f4f7f5 0%,#edf2ef 68%,#e6ece8 100%)!important;
+  border:1px solid #d1ded9!important;
+  box-shadow:inset 0 0 28px rgba(255,255,255,.68),0 8px 18px rgba(61,84,83,.09)!important
+}
+.room-back-wall:before{height:5px!important;background:linear-gradient(90deg,#d8e5e1,#fff 25%,#c6dedb 52%,#fff 78%,#d8e5e1)!important;opacity:1!important}
+.room-window{
+  border:7px solid #fff!important;border-bottom-width:9px!important;
+  background:linear-gradient(180deg,#a9d7ee 0%,#d4ebf2 48%,#b5d6cb 49%,#8eaf9b 100%)!important;
+  box-shadow:0 3px 14px rgba(55,91,105,.18),inset 0 0 0 1px rgba(112,157,168,.22)!important
+}
+.room-window:before{
+  background:
+    radial-gradient(ellipse at 17% 76%,#7eaa89 0 10%,transparent 10.5%),
+    radial-gradient(ellipse at 41% 84%,#779f82 0 15%,transparent 15.5%),
+    radial-gradient(ellipse at 76% 78%,#83ad8c 0 14%,transparent 14.5%),
+    linear-gradient(180deg,transparent 0 48%,rgba(255,255,255,.24) 49%,transparent 52%),
+    linear-gradient(145deg,rgba(255,255,255,.42),transparent 42%)!important
+}
+.window-grid{background:linear-gradient(90deg,transparent 32.8%,rgba(255,255,255,.8) 33%,rgba(255,255,255,.8) 33.6%,transparent 33.8%,transparent 66%,rgba(255,255,255,.8) 66.3%,transparent 66.8%),linear-gradient(180deg,transparent 48%,rgba(255,255,255,.7) 48.5%,transparent 49%)!important}
+.window-horizon{background:linear-gradient(180deg,transparent,rgba(64,112,90,.13)),linear-gradient(0deg,rgba(94,140,105,.35),transparent 80%)!important}
+.wall-title{color:#52727a!important;text-shadow:none!important}
+.wall-title small{color:#8aa2a4!important}
+.wall-status{color:#718a8e!important}.wall-status b{color:#456870!important}.wall-status i{background:linear-gradient(90deg,#69b9ad 0 58%,#d7e5e1 58%)!important}
+.wall-shelf{background:linear-gradient(90deg,#bacbc6,#fff 50%,#bacbc6)!important;box-shadow:0 4px 8px rgba(60,82,78,.12)!important}
+.wall-shelf i{background:linear-gradient(90deg,#d9e8e1,#fff,#c1d8d1)!important;opacity:1!important;border:1px solid #d3e0db}
+.room-left-wall,.room-right-wall{
+  background:linear-gradient(120deg,#f5f7f4,#e6eeea 75%)!important;
+  border:1px solid #cfdbd6!important;
+  box-shadow:inset 0 0 22px rgba(255,255,255,.8),0 4px 10px rgba(66,88,83,.08)!important
+}
+.room-right-wall{background:linear-gradient(240deg,#f8faf8,#e5ece8 75%)!important}
+.wall-console{
+  border:1px solid #c9d9d8!important;
+  background:linear-gradient(150deg,#fff,#e8f1ef)!important;
+  box-shadow:0 7px 16px rgba(62,91,91,.14)!important
+}
+.wall-console b{color:#55767c!important}.console-lights i{background:#61b9a4!important;box-shadow:0 0 5px rgba(97,185,164,.3)!important}
+.wall-console em{background:linear-gradient(90deg,#78b9b6 0 36%,#d5e2df 36%)!important}
+.console-screen{border:1px solid #c4d8d8!important;background:linear-gradient(135deg,#e2f1ef,#fafdff)!important}
+.console-screen:after{color:#588e90!important}
+.wall-ribs{background:rgba(127,162,157,.22)!important;box-shadow:-9px 0 rgba(127,162,157,.12),-18px 0 rgba(127,162,157,.08)!important}
+.room-door{border:5px solid #fff!important;border-bottom-width:8px!important;background:linear-gradient(90deg,#d9e7e8,#f8fbfa 20%,#d6e5e4 83%,#c5d9d9)!important;box-shadow:inset 0 0 14px rgba(77,121,127,.12),0 5px 12px rgba(53,82,88,.12)!important}
+.room-door:before{border:1px solid rgba(96,151,157,.35)!important;background:linear-gradient(135deg,rgba(255,255,255,.5),transparent)!important}
+.room-door span{color:#668990!important}.room-door i{background:#65b7aa!important;box-shadow:0 0 5px rgba(101,183,170,.4)!important}
+.right-wall-lights i{background:#65b8b3!important;box-shadow:0 0 5px rgba(101,184,179,.3)!important}
+.room-floor{
+  background:linear-gradient(180deg,#e6ece8 0%,#dce5df 100%)!important;
+  border-top:1px solid #c7d7d0!important
+}
+.room-floor:before{
+  background:linear-gradient(180deg,rgba(255,255,255,.35),transparent 42%),
+    repeating-linear-gradient(90deg,rgba(132,157,145,.15) 0 1px,transparent 1px 12.5%),
+    repeating-linear-gradient(0deg,rgba(132,157,145,.13) 0 1px,transparent 1px 18%)!important;
+  mask-image:linear-gradient(180deg,rgba(0,0,0,.38),transparent 92%)!important
+}
+.floor-grid{border-color:rgba(130,158,145,.16)!important;background:repeating-linear-gradient(90deg,transparent 0 24%,rgba(130,158,145,.13) 24.2% 24.6%,transparent 25% 49%)!important}
+.floor-light{background:#b6dcd0!important;box-shadow:0 0 10px 2px rgba(111,173,157,.16)!important}
+.room-floor-edge{border-top:1px solid #c6d5ce!important;background:linear-gradient(180deg,#e0e9e4,#d4dfd9)!important}
+.lab-podium{filter:drop-shadow(0 15px 12px rgba(42,65,66,.18))!important}
+.lab-podium:before{
+  border:1px solid #bacdca!important;border-top:0!important;
+  background:linear-gradient(180deg,#edf3f0 0%,#d9e4df 45%,#c6d5d0 100%)!important;
+  box-shadow:inset 0 -8px 13px rgba(81,111,108,.09),inset 0 8px 12px rgba(255,255,255,.65)!important
+}
+.podium-top{border:2px solid #fff!important;background:radial-gradient(ellipse at 50% 42%,#fff,#e7f1ed 68%)!important;box-shadow:0 3px 12px rgba(63,101,100,.13),inset 0 2px 7px rgba(255,255,255,.95)!important}
+.podium-ring{border:1px solid #9cc8c5!important;box-shadow:0 0 8px rgba(105,166,162,.15)!important}
+.stage-hud{color:#52737d!important;text-shadow:0 1px 2px rgba(255,255,255,.9)!important}
+.axis{background:#4bafae!important;box-shadow:0 0 5px rgba(75,175,174,.3)!important}
+.icon-btn{background:rgba(255,255,255,.94)!important;border:1px solid #cbdadf!important;color:#4e7480!important;box-shadow:0 2px 8px rgba(51,82,92,.1);backdrop-filter:blur(8px)}
+.icon-btn:hover{border-color:#79b9bf!important;color:#2e7981!important}
+.toast{background:rgba(255,255,255,.98)!important;border:1px solid #a9d1d1!important;color:#426c70!important;box-shadow:0 6px 18px rgba(53,89,95,.12)}
+
+/* 操作区、场景卡片与智能体 */
+.toolbar{background:#fff!important;border:1px solid #dbe5e8!important;box-shadow:0 4px 14px rgba(49,76,87,.06)!important}
+.tool-label{color:#6f858d!important}.tool-btn{background:#f6f9f9!important;border:1px solid #dce6e8!important;color:#536c76!important}
+.tool-btn:hover,.tool-btn.active{background:#e9f5f4!important;border-color:#9bcac8!important;color:#327a7b!important}
+.tool-btn.primary{background:linear-gradient(110deg,#e1f2f0,#e8f0fa)!important;border-color:#a9d1cf!important;color:#3c7778!important}
+.hint{color:#84959b!important}
+.mode-card{background:linear-gradient(145deg,#fff,#f4f8f7)!important;border:1px solid #d9e4e5!important;box-shadow:0 3px 10px rgba(51,80,89,.05)!important}
+.mode-card:after{background:rgba(117,192,189,.1)!important}
+.mode-card.selected{border-color:#69b5b4!important;box-shadow:inset 0 0 0 1px rgba(90,173,171,.18),0 5px 14px rgba(63,144,145,.1)!important;background:linear-gradient(145deg,#f4fbf9,#e7f3f2)!important}
+.mode-number{color:#789399!important}.mode-icon{background:#eaf4f2!important;border:1px solid #d4e6e2!important;color:#4c9997!important}.mode-name{color:#2c4651!important}.mode-sub{color:#7c9096!important}
+.agent{border:1px solid #d7e3e7!important;background:linear-gradient(180deg,#fff 0%,#fbfdfd 100%)!important;box-shadow:0 10px 28px rgba(45,76,88,.1)!important}
+.agent:before{background:radial-gradient(ellipse,rgba(117,190,191,.12),transparent 70%)!important}
+.agent-head{border-bottom:1px solid #e3ebed!important}
+.agent-role{color:#78909a!important}.online{color:#398d78!important}.online:before{background:#64b99c!important;box-shadow:0 0 5px rgba(100,185,156,.35)!important}
+.avatar-core{box-shadow:0 5px 14px rgba(63,139,160,.22),inset -5px -6px 10px rgba(28,87,126,.16)!important}
+.orbit{border-color:rgba(82,165,174,.28)!important}.orbit.two{border-color:rgba(130,157,190,.3)!important}
+.agent-intro{background:#f0f7f6!important;border:1px solid #dcebe7!important;color:#58727a!important}
+.agent-intro b{color:#2d5f65!important}
+.chat-log{scrollbar-color:#c6d8d9 transparent!important}
+.msg-label{color:#82979e!important}
+.bot .bubble{background:#f0f6f5!important;border:1px solid #e0eae8!important;color:#405b64!important}
+.user .bubble{background:linear-gradient(120deg,#e1f2ef,#e6eff8)!important;border:1px solid #d1e5e3!important;color:#355b67!important}
+.bubble strong{color:#245d66!important}.bubble .math{color:#347d83!important;background:#e4f1ef!important}
+.quick-asks{border-top:1px solid #e7eeee!important}
+.quick{background:#f5f9f8!important;border:1px solid #dce8e6!important;color:#57777c!important}
+.quick:hover{border-color:#8fc6c4!important;color:#347d80!important}
+.chat-input{background:#fff!important;border:1px solid #d6e2e5!important;color:#334f59!important}
+.chat-input::placeholder{color:#9aaab0!important}.chat-input:focus{border-color:#86c2c0!important;box-shadow:0 0 0 2px rgba(113,186,181,.12)!important}
+.send{background:linear-gradient(135deg,#7cc6c0,#82b6d8)!important;color:#fff!important;box-shadow:0 4px 12px rgba(74,151,164,.18)!important}
+.agent-foot{color:#8a9ba1!important}.agent-foot span{color:#4e8d90!important}
+
+/* 弹窗与自由创作：明亮工作室、浅色操作桌 */
+.modal{background:rgba(34,54,61,.42)!important;backdrop-filter:blur(8px)!important}
+.modal-card{border:1px solid #d9e4e5!important;background:linear-gradient(145deg,#fff,#f5f8f7)!important;color:#2d4650!important;box-shadow:0 24px 70px rgba(40,65,75,.2)!important}
+.modal-title{color:#2e4b56!important}.close{background:#f4f8f7!important;border:1px solid #d8e4e4!important;color:#58737b!important}
+.reference-card{border:1px solid #dce7e5!important;background:#f8fbfa!important}.reference-card h3{color:#38565f!important}.reference-card p{color:#70858b!important}
+.help-text{color:#587078!important}.help-text h3{color:#356d76!important}.help-text code{color:#337d83!important;background:#e8f3f1!important}
+.disclaimer{color:#7c8f94!important;border-top:1px solid #dce7e6!important}
+.studio-card{border:1px solid #d4e1e2!important;background:linear-gradient(145deg,#fff 0%,#f5f8f7 100%)!important;box-shadow:0 24px 75px rgba(37,64,73,.22)!important}
+.studio-head{background:#fff!important;border-bottom:1px solid #dfe9e8!important;color:#2f4b55!important}
+.studio-head small{color:#78949a!important}.studio-head .tag{background:#eff8f6!important;color:#518a87!important}
+.studio-side{background:linear-gradient(180deg,#f8fbfa,#edf4f1)!important;border-right:1px solid #dce7e4!important}
+.studio-section-title{color:#427d7e!important}.studio-subtitle{color:#778c91!important}
+.studio-shape{border:1px solid #d7e5e1!important;background:#fff!important;color:#536c72!important;box-shadow:0 2px 6px rgba(49,80,81,.04)}
+.studio-shape:hover{border-color:#8fc6bd!important;background:#eff8f5!important}
+.studio-shape .shape-glyph{color:#529b9a!important;text-shadow:none!important}
+.studio-op{border:1px solid #d8e4e2!important;background:#fff!important;color:#5b747a!important}
+.studio-op:hover{border-color:#96c7c2!important;color:#397b7a!important}.studio-op.danger:hover{border-color:#df9eaa!important;color:#b45a70!important}
+.studio-separator{background:#dce7e4!important}
+.angle-select-row select{background:#fff!important;color:#49616a!important;border:1px solid #d5e2df!important}
+.angle-chip{border:1px solid #c7e1dc!important;background:#edf7f4!important;color:#477b78!important}.angle-chip button{color:#729493!important}
+.angle-result{border:1px solid #d9e7e2!important;background:#fff!important}
+.angle-total b{color:#b27c37!important}.angle-total span,.angle-status{color:#73878b!important}
+.angle-status.good{color:#278568!important}.angle-status.warn{color:#ae7a30!important}.angle-status.bad{color:#c65e72!important}
+.angle-presets button{background:#f4f8f7!important;border:1px solid #dce7e4!important;color:#668087!important}
+.studio-toolbar button{border:1px solid #d7e4e2!important;background:#fff!important;color:#5a7379!important}
+.studio-toolbar button:hover{border-color:#8fc6c0!important;color:#397b7a!important}
+.studio-toolbar .studio-primary{background:linear-gradient(110deg,#e2f3ef,#e9f1f8)!important;border-color:#a7d1c9!important;color:#397b77!important}
+.studio-info{color:#7a9095!important}
+.creator-board-wrap{
+  border:9px solid #c5d7cf!important;border-bottom-width:14px!important;border-radius:12px!important;
+  background-color:#f7faf7!important;
+  background-image:linear-gradient(rgba(106,150,136,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(106,150,136,.12) 1px,transparent 1px),linear-gradient(145deg,#fbfdfb,#edf4ef)!important;
+  background-size:28px 28px,28px 28px,auto!important;
+  box-shadow:0 12px 0 -7px #9aafa5,0 19px 25px rgba(44,75,65,.14),inset 0 0 0 2px rgba(255,255,255,.85)!important
+}
+.creator-board-wrap:before{background:linear-gradient(90deg,#d9e6e0,#fff 48%,#d9e6e0)!important;opacity:1!important}
+#creatorBoard{background:transparent!important}
+.creator-board-note{color:#718b83!important;text-shadow:0 1px 2px rgba(255,255,255,.9)!important}
+.creator-status{color:#738a8d!important}.creator-status b{color:#3f6f6e!important}.creator-status .status-dot{background:#60ae93!important;box-shadow:0 0 5px rgba(96,174,147,.3)!important}
+#geometryReport{border:1px solid #d5e5df!important;background:linear-gradient(110deg,#f4faf7,#edf5f3)!important;color:#46666a!important}
+.geometry-head{color:#397a79!important}.geometry-head .geometry-pill{border:1px solid #cbdedb!important;color:#648685!important}
+.geometry-summary{color:#536e73!important}.geometry-summary strong{color:#2e6468!important}.geometry-detail{color:#7d9295!important}
+.geometry-mark-text{fill:#fff!important;stroke:#42656b!important}
+@media(max-width:850px){.topbar{background:#fff!important}.room-left-wall,.room-right-wall{width:21%}}
+
+
+/* V5.1 明暗层次与明亮创作室修整 */
+.stage-wrap.room-stage:before{background:linear-gradient(110deg,rgba(255,255,255,.04),transparent 38%,transparent 72%,rgba(80,155,148,.035))!important}
+.room-shell{background:linear-gradient(180deg,#f4f7f3 0%,#e9efea 52%,#dfe8e1 100%)!important}
+.room-ceiling{background:linear-gradient(180deg,#fff 0%,#f3f6f2 72%,#e8efea 100%)!important}
+.room-back-wall{background:linear-gradient(180deg,#eef3ee 0%,#e7eeea 68%,#e0e9e4 100%)!important}
+.room-left-wall{background:linear-gradient(120deg,#e9f0eb,#dce7e1 75%)!important}
+.room-right-wall{background:linear-gradient(240deg,#edf3f2,#dce8e7 75%)!important}
+.room-floor{background:linear-gradient(180deg,#dce6df 0%,#d2ded6 100%)!important}
+.room-floor:before{background:linear-gradient(180deg,rgba(255,255,255,.15),transparent 42%),repeating-linear-gradient(90deg,rgba(108,139,125,.19) 0 1px,transparent 1px 12.5%),repeating-linear-gradient(0deg,rgba(108,139,125,.16) 0 1px,transparent 1px 18%)!important}
+.room-floor-edge{background:linear-gradient(180deg,#d7e2da,#cbd9d1)!important}
+.lab-podium:before{background:linear-gradient(180deg,#e8efea 0%,#d2dfd8 45%,#bfcec7 100%)!important}
+.podium-top{background:radial-gradient(ellipse at 50% 42%,#fbfdf9,#dce9e3 68%)!important}
+.studio-main{background:linear-gradient(180deg,#eef4f0 0%,#e7efea 56.5%,#d9e4dd 57%,#d2ded6 100%)!important}
+.studio-main:before{background:linear-gradient(90deg,transparent 0 8%,rgba(118,157,143,.12) 8.2% 8.5%,transparent 8.7% 91%,rgba(118,157,143,.12) 91.2% 91.5%,transparent 91.7%),linear-gradient(180deg,rgba(255,255,255,.6),transparent 65%)!important;border-bottom:4px solid rgba(138,169,153,.24)!important}
+.studio-main:after{background:repeating-linear-gradient(90deg,rgba(115,153,134,.12) 0 1px,transparent 1px 16%),repeating-linear-gradient(0deg,rgba(115,153,134,.1) 0 1px,transparent 1px 22%)!important}
+
+
+/* 最终微调：加入更明显的墙面层次、展台材质和空间标识 */
+.room-ceiling{background:linear-gradient(180deg,#fbfcf9 0%,#e9f0eb 74%,#dfe9e3 100%)!important}
+.room-back-wall{background:linear-gradient(180deg,#e8efea 0%,#e0e9e3 68%,#d8e3dc 100%)!important}
+.room-left-wall{background:linear-gradient(120deg,#e2ebe5,#d2dfd7 75%)!important}
+.room-right-wall{background:linear-gradient(240deg,#e8efed,#d3e1dc 75%)!important}
+.room-floor{background:linear-gradient(180deg,#d4e0d7 0%,#c8d7ce 100%)!important}
+.room-floor:before{background:linear-gradient(180deg,rgba(255,255,255,.12),transparent 42%),repeating-linear-gradient(90deg,rgba(100,132,117,.22) 0 1px,transparent 1px 12.5%),repeating-linear-gradient(0deg,rgba(100,132,117,.18) 0 1px,transparent 1px 18%)!important}
+.wall-title{top:5%!important;left:4%!important;color:#4f7774!important}
+.wall-title small{color:#769895!important}
+.wall-status{top:7%!important}
+.lab-podium:before{background:linear-gradient(180deg,#dce8e1 0%,#c7d8cf 45%,#b6c9c0 100%)!important;border-color:#a9c0b5!important}
+.podium-top{background:radial-gradient(ellipse at 50% 42%,#fbfcf7,#d7e6dc 68%)!important;border-color:#fafffc!important}
+.stage-wrap.room-stage{background:linear-gradient(180deg,#e9f0ec 0%,#e2ebe5 54%,#d6e2da 100%)!important}
+
+
+
+/* V6：让密铺成为建筑本身，而不是贴在普通房间上的装饰 */
+:root{--bg:#f1eee5;--panel:#fbfaf5;--panel2:#eef3ed;--line:#d7e0d8;--cyan:#4c9897;--blue:#668cae;--gold:#bd9152;--pink:#c67c63;--text:#304c4b;--muted:#788c83;--good:#4f9b80;--shadow:0 18px 44px rgba(54,76,65,.12)}
+html,body{background:#eeeae0!important;color:#334e4c!important}
+.app{background:linear-gradient(180deg,#f6f4ed 0%,#eeeee6 100%)!important}
+.app:before{display:none!important}
+.topbar{background:rgba(250,249,244,.96)!important;border-bottom:1px solid #d9dfd5!important;box-shadow:0 4px 18px rgba(68,83,70,.06)!important;backdrop-filter:blur(12px)}
+.brand-mark{background:linear-gradient(145deg,#d4a45f,#9ebdb1 52%,#6e9da0)!important;box-shadow:0 5px 13px rgba(105,145,128,.2)!important}
+.brand-mark:before{border-color:#fffaf0!important;border-radius:0!important;transform:rotate(45deg) scale(.95)}
+.brand-title{color:#315451!important}.brand-sub{color:#82968b!important}
+.top-center{color:#72877e!important}.top-center .spark{color:#b58c55!important}
+.tag{border-color:#d6e3dc!important;background:#eef5ef!important;color:#56847b!important}
+.top-btn{border-color:#d9e2dc!important;background:#fffefa!important;color:#526c65!important;box-shadow:0 2px 6px rgba(59,89,75,.04)}
+.top-btn:hover{border-color:#9cbeb1!important;color:#356d6b!important;background:#f2f8f2!important}
+.scene-kicker{color:#8d8a6d!important;letter-spacing:2.1px}
+.scene-title{color:#304d49!important}
+.scene-desc{color:#788d82!important}
+.metric{background:#fffdf7!important;border:1px solid #e1dfd2!important;box-shadow:0 4px 12px rgba(80,89,69,.05)!important}
+.metric b{color:#b78243!important}.metric span{color:#7d9186!important}
+.stage-wrap.room-stage{border:1px solid #c8d5cb!important;border-radius:20px!important;background:#e4e8dc!important;box-shadow:0 18px 40px rgba(58,79,64,.16),inset 0 0 0 5px rgba(255,255,255,.45)!important}
+.stage-wrap.room-stage:before{z-index:4;background:linear-gradient(115deg,rgba(255,255,255,.2),transparent 34%,transparent 70%,rgba(198,164,111,.08))!important;pointer-events:none}
+.stage-wrap.room-stage:after{display:none!important}
+.room-shell{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;background:#e8e8df!important}
+.room-architecture{position:absolute;inset:0;width:100%;height:100%;display:block}
+.lab-podium{display:none!important}
+.stage-canvas{z-index:3!important;background:transparent!important}
+.stage-hud{z-index:6!important;color:#58766d!important;text-shadow:0 1px 3px rgba(255,253,245,.9)!important;font-size:10px;letter-spacing:.7px}
+.hud-left,.hud-right{background:rgba(255,253,247,.78);border:1px solid rgba(191,204,190,.65);border-radius:10px;padding:8px 10px;box-shadow:0 4px 12px rgba(70,89,72,.06);backdrop-filter:blur(5px)}
+.hud-left{left:16px;top:15px}.hud-right{right:16px;top:15px}
+.hud-bottom{left:20px;bottom:14px;background:rgba(255,253,247,.74);border:1px solid rgba(191,204,190,.55);padding:6px 10px;border-radius:20px;color:#698178!important}
+.axis{background:#c08f4b!important;box-shadow:0 0 0 3px rgba(192,143,75,.16)!important}
+.stage-controls{z-index:7!important}
+.icon-btn{background:rgba(255,253,247,.94)!important;border:1px solid #cddbd0!important;color:#537b73!important;box-shadow:0 4px 12px rgba(55,76,62,.12)!important;backdrop-filter:blur(8px)}
+.icon-btn:hover{border-color:#8eafa2!important;color:#356e69!important}
+.toast{background:#fffdf7!important;border:1px solid #bdcfc2!important;color:#4c756c!important;box-shadow:0 8px 24px rgba(50,72,56,.14)!important}
+.toolbar{background:#fbfaf4!important;border:1px solid #d9e2d8!important;box-shadow:0 6px 18px rgba(58,78,64,.07)!important}
+.tool-label{color:#7a8c7e!important}.tool-btn{background:#f8f8f1!important;border:1px solid #dbe3d9!important;color:#567168!important}
+.tool-btn.primary{background:linear-gradient(110deg,#e8f1e9,#f4ebd9)!important;border-color:#c8d8ca!important;color:#4e7771!important}
+.tool-btn:hover,.tool-btn.active{background:#eef6ef!important;border-color:#9ebdaf!important;color:#356e69!important}
+.hint{color:#87958a!important}
+.mode-card{background:linear-gradient(145deg,#fffef9,#f1f3ea)!important;border:1px solid #dbe2d8!important;box-shadow:0 5px 14px rgba(56,78,63,.07)!important}
+.mode-card:after{background:rgba(185,157,105,.08)!important}
+.mode-card.selected{background:linear-gradient(145deg,#f4f6ec,#e5efe7)!important;border-color:#8fb5a7!important;box-shadow:inset 0 0 0 1px rgba(105,157,139,.2),0 7px 18px rgba(68,112,90,.12)!important}
+.mode-number{color:#8b9a8e!important}.mode-icon{background:#edf3ea!important;border:1px solid #d6e2d6!important;color:#5d9489!important}.mode-name{color:#34534e!important}.mode-sub{color:#84948a!important}
+.agent{background:linear-gradient(180deg,#fffef9,#f8f8f1)!important;border:1px solid #d9e2d8!important;box-shadow:0 12px 28px rgba(62,79,65,.12)!important}
+.agent:before{background:radial-gradient(ellipse,rgba(174,199,179,.18),transparent 72%)!important}
+.agent-head{border-bottom:1px solid #e3e7dc!important}.agent-name{color:#35544f!important}.agent-role{color:#7a8f85!important}.online{color:#538e75!important}
+.agent-intro{background:#f1f5ec!important;border-color:#e1e8dc!important;color:#60786d!important}.agent-intro b{color:#365f56!important}
+.bot .bubble{background:#f1f5ed!important;border-color:#e3e9dc!important;color:#4b655a!important}.msg-label{color:#829387!important}
+.user .bubble{background:#eaf2f0!important;border-color:#d7e5df!important;color:#456d68!important}
+.quick{background:#f8f8f1!important;border-color:#e0e6dc!important;color:#648177!important}.quick:hover{border-color:#a5c5b5!important;color:#3e796e!important}
+.chat-input{border-color:#d8e2d9!important;background:#fffefa!important;color:#405d54!important}.send{background:linear-gradient(135deg,#8bb9a5,#85aeb8)!important}
+.agent-foot{color:#8c9a8d!important}.agent-foot span{color:#528d7b!important}
+@media(max-width:1000px){.room-architecture{min-width:100%;object-fit:cover}}
+
+
+/* ===== POLYLAB V7 · 全景沉浸式密铺实验室 ===== */
+:root{--room-ink:#18364b;--room-blue:#2875b9;--room-aqua:#57cfe1;--room-gold:#e6b34e;--room-line:#d3e3e5}
+html,body{width:100%;height:100%;overflow:hidden;background:#e9f2f3;color:var(--room-ink)}
+body.room-body{margin:0;font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif}
+#polylab-room{position:fixed;inset:0;overflow:hidden;background:#dce8e9;isolation:isolate}
+#polylab-room .room-backdrop{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center;user-select:none;-webkit-user-drag:none}
+#polylab-room:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.06),transparent 28%,transparent 78%,rgba(37,61,75,.08));z-index:1}
+.room-hit-layer{position:absolute;inset:0;z-index:3}
+.room-hit{position:absolute;display:block;border:0;background:transparent;border-radius:14px;cursor:pointer;outline:none;transition:background .18s,box-shadow .18s,transform .18s;touch-action:manipulation}
+.room-hit:hover,.room-hit:focus-visible{background:rgba(255,255,255,.12);box-shadow:0 0 0 3px rgba(255,255,255,.86),0 0 22px rgba(47,166,220,.58),inset 0 0 18px rgba(95,204,235,.18);transform:translateY(-2px)}
+.room-hit:active{transform:scale(.985)}
+.room-hit .hit-label{position:absolute;left:50%;top:100%;transform:translate(-50%,7px);white-space:nowrap;background:rgba(255,255,255,.96);border:1px solid #cbdfe6;border-radius:20px;padding:5px 11px;color:#26516c;font-size:12px;font-weight:700;box-shadow:0 5px 18px rgba(28,64,87,.14);opacity:0;pointer-events:none;transition:.16s}
+.room-hit:hover .hit-label,.room-hit:focus-visible .hit-label{opacity:1}
+.hit-sample-1{left:3.7%;top:28.4%;width:10.2%;height:13.3%}
+.hit-sample-2{left:16.0%;top:28.4%;width:9.9%;height:13.3%}
+.hit-sample-3{left:27.1%;top:30.5%;width:5.2%;height:11.5%}
+.hit-center-model{left:35.5%;top:21.2%;width:32.7%;height:43.5%;border-radius:48%}
+.hit-robot{left:69.8%;top:32.5%;width:14.1%;height:29.4%;border-radius:32%}
+.hit-nav-1{left:86.8%;top:50.8%;width:11.4%;height:7.8%}
+.hit-nav-2{left:86.8%;top:58.8%;width:11.4%;height:7.8%}
+.hit-nav-3{left:86.8%;top:66.1%;width:11.4%;height:7.8%}
+.hit-nav-4{left:86.8%;top:73.7%;width:11.4%;height:7.8%}
+.hit-bench{left:0;bottom:0;width:32%;height:28%;border-radius:0 26px 0 0}
+.room-hotspot-label{position:absolute;z-index:4;right:2.1%;top:4.3%;padding:8px 13px;border:1px solid rgba(255,255,255,.88);border-radius:24px;background:rgba(255,255,255,.76);backdrop-filter:blur(8px);color:#35627a;font-size:11px;box-shadow:0 4px 18px rgba(37,76,97,.10);pointer-events:none}
+.engine-sandbox{position:fixed!important;left:-220vw!important;top:0!important;width:1500px!important;height:920px!important;overflow:hidden!important;opacity:0!important;pointer-events:none!important;z-index:-100!important;contain:layout paint!important}
+.engine-sandbox .app{width:100%;height:100%;min-height:0}
+/* Existing model and chat engine are moved into visible room panels at startup. */
+.room-overlay{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;padding:clamp(10px,2vw,28px);background:rgba(30,54,69,.28);backdrop-filter:blur(5px)}
+.room-overlay.open{display:flex}
+.room-panel-card{width:min(1180px,96vw);max-height:94vh;overflow:auto;border:1px solid rgba(255,255,255,.85);border-radius:24px;background:linear-gradient(145deg,rgba(255,255,255,.98),rgba(242,249,247,.98));box-shadow:0 24px 85px rgba(22,56,76,.28);color:#24465b}
+.room-panel-head{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid #dbe8e7;background:linear-gradient(90deg,#fff,#f1f8f7);border-radius:24px 24px 0 0}
+.room-panel-head strong{font-size:17px;letter-spacing:.3px;color:#20475f}
+.room-panel-head small{display:block;color:#73909b;font-size:10px;letter-spacing:1.1px;margin-top:3px}
+.room-panel-head .room-close{margin-left:auto;border:1px solid #cbdde0;background:#fff;color:#345c70;border-radius:20px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer}
+.room-panel-head .room-close:hover{background:#eaf7f8;border-color:#86cbd8}
+.room-model-content{padding:14px 16px 18px;display:flex;flex-direction:column;gap:12px}
+.room-model-content .scene-head{padding:4px 4px 0;color:#23475e}
+.room-model-content .scene-kicker{color:#4a9eac}
+.room-model-content .scene-title{color:#244e67}
+.room-model-content .scene-desc{color:#63808c}
+.room-model-content .scene-metrics .metric{background:#f0f7f5;border:1px solid #d9e9e5;color:#27546a}
+.room-model-content .metric b{color:#c38e31}.room-model-content .metric span{color:#66818b}
+.room-model-content .stage-wrap{height:min(52vh,520px);min-height:300px;flex:0 0 auto;border:1px solid #cadeda;border-radius:17px;background:radial-gradient(ellipse at 50% 45%,#f7fbf8,#e6f0ec 78%);box-shadow:inset 0 0 30px rgba(84,151,157,.08),0 8px 22px rgba(51,88,93,.08)}
+.room-model-content .stage-wrap:before,.room-model-content .stage-wrap:after{display:none}
+.room-model-content .room-shell{display:none}
+.room-model-content .stage-canvas{cursor:grab}
+.room-model-content .stage-hud{color:#527881}
+.room-model-content .toolbar{background:#f3f8f6;border:1px solid #d6e5e1}
+.room-model-content .tool-label,.room-model-content .hint{color:#64818b}
+.room-model-content .tool-btn{background:#fff;border:1px solid #d2e3e2;color:#315c70}
+.room-model-content .tool-btn.primary{background:linear-gradient(100deg,#e5f6f4,#eaf1ff);border-color:#a8d4d9;color:#245c70}
+.room-model-content .mode-card{background:#fff;border:1px solid #d5e4e2;color:#31566a;box-shadow:0 3px 10px rgba(37,77,87,.05)}
+.room-model-content .mode-card.selected{background:#eaf6f5;border-color:#74bcc8;box-shadow:0 0 0 2px rgba(91,185,198,.12)}
+.room-model-content .mode-name{color:#234d64}.room-model-content .mode-sub{color:#6b8791}
+.room-model-content .icon-btn{background:#fff;color:#386b7d;border:1px solid #cbdfe0}
+.room-model-content .toast{background:#fff;color:#2c596e;border-color:#a9d9df}
+.room-choice-card{width:min(960px,95vw);padding:24px;background:#f9fcfa;border:1px solid white;border-radius:25px;box-shadow:0 26px 90px rgba(29,66,81,.25)}
+.room-choice-title{font-size:23px;font-weight:850;color:#234b63;margin:0 0 6px}
+.room-choice-sub{font-size:13px;color:#6c8791;margin:0 0 20px}
+.room-choice-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.room-choice-option{border:1px solid #d5e5e2;border-radius:18px;overflow:hidden;background:#fff;text-align:left;color:#2c5267;cursor:pointer;transition:.2s;padding:0;box-shadow:0 5px 16px rgba(41,85,94,.07)}
+.room-choice-option:hover{transform:translateY(-4px);border-color:#82c7cf;box-shadow:0 12px 26px rgba(41,106,123,.14)}
+.room-choice-art{height:155px;display:grid;place-items:center;background:linear-gradient(135deg,#edf7f4,#edf3fb);font-size:76px;color:#397e99}
+.room-choice-art svg{width:100%;height:100%}
+.room-choice-copy{padding:14px 15px 16px}.room-choice-copy b{display:block;font-size:15px;margin-bottom:5px}.room-choice-copy span{font-size:11px;color:#718a94;line-height:1.6}
+.room-choice-enter{display:inline-flex;margin-top:10px;border-radius:18px;padding:7px 12px;background:#e8f6f5;color:#2f7484;font-size:11px;font-weight:800}
+.room-chat-panel{position:fixed;z-index:90;right:clamp(12px,2vw,28px);top:50%;transform:translateY(-50%) translateX(18px);width:min(390px,calc(100vw - 24px));height:min(790px,92vh);opacity:0;visibility:hidden;pointer-events:none;transition:.24s;filter:drop-shadow(0 20px 45px rgba(34,66,83,.22))}
+.room-chat-panel.open{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(-50%) translateX(0)}
+.room-chat-card{height:100%;display:flex;flex-direction:column;border:1px solid rgba(255,255,255,.9);border-radius:22px;overflow:hidden;background:rgba(255,255,255,.97);box-shadow:0 14px 48px rgba(29,64,81,.2)}
+.room-chat-top{height:48px;flex:0 0 48px;display:flex;align-items:center;padding:0 14px;background:linear-gradient(90deg,#e9f8f8,#eef3ff);border-bottom:1px solid #dce8e8;color:#28566b;font-size:13px;font-weight:800}
+.room-chat-top button{margin-left:auto;border:1px solid #c9dfe2;background:white;color:#386a7b;border-radius:50%;width:28px;height:28px;cursor:pointer}
+#roomChatSlot{min-height:0;flex:1;display:flex}
+#roomChatSlot .agent{width:100%;height:100%;min-height:0;border:0;border-radius:0;background:#fff;box-shadow:none;color:#294d60}
+#roomChatSlot .agent:before{display:none}
+#roomChatSlot .agent-head{padding:12px 14px 10px;border-bottom:1px solid #e6eeee}
+#roomChatSlot .agent-name{color:#224d64}
+#roomChatSlot .agent-role{color:#6c8791}
+#roomChatSlot .online{color:#399c82}
+#roomChatSlot .agent-intro{background:#f0f8f7;border-color:#d8eae6;color:#4c6e79}
+#roomChatSlot .agent-intro b{color:#244f65}
+#roomChatSlot .chat-log{background:#fbfdfc;scrollbar-color:#c7dedb transparent}
+#roomChatSlot .msg-label{color:#819aa1}
+#roomChatSlot .bot .bubble{background:#edf7f6;border:1px solid #deece9;color:#355c6c}
+#roomChatSlot .user .bubble{background:#e8f1ff;border:1px solid #d4e2f5;color:#315b77}
+#roomChatSlot .bubble strong{color:#1e607b}
+#roomChatSlot .bubble .math{background:#e2f2f2;color:#236c7e}
+#roomChatSlot .quick-asks{background:#fff;border-color:#e5eeee}
+#roomChatSlot .quick{background:#f3f8fa;border-color:#d8e8eb;color:#4a7283}
+#roomChatSlot .quick:hover{color:#1d6980;border-color:#8bcbd3}
+#roomChatSlot .chat-input{background:#fff;color:#264d62;border-color:#ccdedf}
+#roomChatSlot .chat-input::placeholder{color:#93a8ad}
+#roomChatSlot .send{background:linear-gradient(135deg,#65cfe0,#6e9ee2);color:white}
+#roomChatSlot .agent-foot{color:#81969e}
+.room-challenge-list{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+.room-challenge{border:1px solid #d7e7e4;border-radius:15px;padding:16px;background:#fff;color:#315b6d;text-align:left;cursor:pointer}
+.room-challenge b{display:block;font-size:14px;margin:8px 0 5px}.room-challenge span{font-size:11px;color:#738d96;line-height:1.6}.room-challenge em{font-style:normal;font-size:27px;color:#55aabb}
+/* Brighten the existing creation and reference windows to match the illustrated room. */
+#refsModal,#helpModal,#studioModal{background:rgba(45,72,84,.30);backdrop-filter:blur(7px)}
+#refsModal .modal-card,#helpModal .modal-card{background:linear-gradient(145deg,#ffffff,#f2f8f6);border:1px solid #d6e6e4;box-shadow:0 24px 75px rgba(26,66,81,.22);color:#294f63}
+#refsModal .modal-title,#helpModal .modal-title{color:#244d63}
+#refsModal .reference-card{background:#fff;border-color:#dce9e6}
+#refsModal .reference-card p,#helpModal .help-text{color:#577681}
+#helpModal .help-text h3{color:#2b7183}
+#refsModal .close,#helpModal .close{background:#f5faf9;border-color:#d2e4e1;color:#315b6c}
+#studioModal .studio-card{background:linear-gradient(145deg,#fbfdfb,#edf5f3);border:1px solid #ccdfdc;box-shadow:0 24px 85px rgba(26,62,77,.26);color:#2c5264}
+#studioModal .studio-head{background:#f6fbf9;border-color:#dce9e5;color:#244d63}
+#studioModal .studio-head small{color:#708b94}
+#studioModal .studio-head .tag{background:#edf8f6;border-color:#c8e4e1;color:#397b88}
+#studioModal .studio-side{background:#f5faf8;border-color:#dce9e5}
+#studioModal .studio-section-title{color:#347f8d}
+#studioModal .studio-subtitle{color:#68838d}
+#studioModal .studio-shape{background:#fff;border-color:#d8e7e4;color:#315a6d}
+#studioModal .studio-shape .shape-glyph{color:#388fa3;text-shadow:none}
+#studioModal .studio-op,#studioModal .studio-toolbar button{background:#fff;border-color:#d4e4e1;color:#3d6373}
+#studioModal .studio-main{background:#f7fbf9}
+#studioModal .creator-board-wrap{background:linear-gradient(145deg,#f9fcfa,#eaf3ef);border-color:#cddfd9}
+#studioModal .creator-board-note{color:#6e8b91}
+#studioModal .creator-status{color:#67838a}
+#studioModal .creator-status b{color:#285b6d}
+#studioModal .studio-info{color:#6c8891}
+#studioModal .angle-result{background:#edf7f5;border-color:#d5e7e2;color:#345e6b}
+#studioModal .angle-total b{color:#2b7d8c}
+#studioModal .disclaimer{color:#70878e;border-color:#dce9e5}
+#studioModal .studio-side select{background:#fff;color:#315568;border-color:#d3e4e1}
+#geometryReport{background:#f1f8f5;border-color:#cfe3dc;color:#31596a}
+#geometryReport .geometry-head{color:#2b7380}
+#geometryReport .geometry-summary{color:#3c6473}
+#geometryReport .geometry-detail{color:#66828b}
+#geometryReport .geometry-summary strong{color:#1f6677}
+#studioModal .disclaimer{border-top-color:#d7e5e2}
+@media(max-width:900px){
+ .room-hotspot-label{display:none}
+ .room-panel-card{max-height:96vh}
+ .room-model-content .stage-wrap{height:42vh;min-height:260px}
+ .room-choice-grid{gap:9px}.room-choice-art{height:120px;font-size:58px}
+ .room-chat-panel{right:10px;top:auto;bottom:10px;transform:translateY(15px);height:min(680px,88vh)}
+ .room-chat-panel.open{transform:translateY(0)}
+}
+@media(max-width:620px){
+ #polylab-room .room-backdrop{object-position:center center}
+ .hit-nav-1,.hit-nav-2,.hit-nav-3,.hit-nav-4{left:85%;width:14%;}
+ .hit-sample-3{left:27%;width:6%}
+ .room-choice-grid{grid-template-columns:1fr}
+ .room-choice-art{height:86px;font-size:44px}
+ .room-choice-card{padding:16px;max-height:94vh;overflow:auto}
+ .room-choice-title{font-size:19px}
+ .room-challenge-list{grid-template-columns:1fr}
+ .room-panel-head{padding:12px 14px}
+ .room-model-content{padding:9px}
+ .room-model-content .scene-head{display:block}
+ .room-model-content .scene-metrics{margin-top:10px}
+}
+
+
+/* ===== POLYLAB V7 · 全景沉浸式密铺实验室 ===== */
+:root{--room-ink:#18364b;--room-blue:#2875b9;--room-aqua:#57cfe1;--room-gold:#e6b34e;--room-line:#d3e3e5}
+html,body{width:100%;height:100%;overflow:hidden;background:#e9f2f3;color:var(--room-ink)}
+body.room-body{margin:0;font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif}
+#polylab-room{position:fixed;inset:0;overflow:hidden;background:#dce8e9;isolation:isolate}
+#polylab-room .room-backdrop{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center;user-select:none;-webkit-user-drag:none}
+#polylab-room:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,.06),transparent 28%,transparent 78%,rgba(37,61,75,.08));z-index:1}
+.room-hit-layer{position:absolute;inset:0;z-index:3}
+.room-hit{position:absolute;display:block;border:0;background:transparent;border-radius:14px;cursor:pointer;outline:none;transition:background .18s,box-shadow .18s,transform .18s;touch-action:manipulation}
+.room-hit:hover,.room-hit:focus-visible{background:rgba(255,255,255,.12);box-shadow:0 0 0 3px rgba(255,255,255,.86),0 0 22px rgba(47,166,220,.58),inset 0 0 18px rgba(95,204,235,.18);transform:translateY(-2px)}
+.room-hit:active{transform:scale(.985)}
+.room-hit .hit-label{position:absolute;left:50%;top:100%;transform:translate(-50%,7px);white-space:nowrap;background:rgba(255,255,255,.96);border:1px solid #cbdfe6;border-radius:20px;padding:5px 11px;color:#26516c;font-size:12px;font-weight:700;box-shadow:0 5px 18px rgba(28,64,87,.14);opacity:0;pointer-events:none;transition:.16s}
+.room-hit:hover .hit-label,.room-hit:focus-visible .hit-label{opacity:1}
+.hit-sample-1{left:3.7%;top:28.4%;width:10.2%;height:13.3%}
+.hit-sample-2{left:16.0%;top:28.4%;width:9.9%;height:13.3%}
+.hit-sample-3{left:27.1%;top:30.5%;width:5.2%;height:11.5%}
+.hit-center-model{left:35.5%;top:21.2%;width:32.7%;height:43.5%;border-radius:48%}
+.hit-robot{left:69.8%;top:32.5%;width:14.1%;height:29.4%;border-radius:32%}
+.hit-nav-1{left:86.8%;top:50.8%;width:11.4%;height:7.8%}
+.hit-nav-2{left:86.8%;top:58.8%;width:11.4%;height:7.8%}
+.hit-nav-3{left:86.8%;top:66.1%;width:11.4%;height:7.8%}
+.hit-nav-4{left:86.8%;top:73.7%;width:11.4%;height:7.8%}
+.hit-bench{left:0;bottom:0;width:32%;height:28%;border-radius:0 26px 0 0}
+.room-hotspot-label{position:absolute;z-index:4;right:2.1%;top:4.3%;padding:8px 13px;border:1px solid rgba(255,255,255,.88);border-radius:24px;background:rgba(255,255,255,.76);backdrop-filter:blur(8px);color:#35627a;font-size:11px;box-shadow:0 4px 18px rgba(37,76,97,.10);pointer-events:none}
+.engine-sandbox{position:fixed!important;left:-220vw!important;top:0!important;width:1500px!important;height:920px!important;overflow:hidden!important;opacity:0!important;pointer-events:none!important;z-index:-100!important;contain:layout paint!important}
+.engine-sandbox .app{width:100%;height:100%;min-height:0}
+/* Existing model and chat engine are moved into visible room panels at startup. */
+.room-overlay{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;padding:clamp(10px,2vw,28px);background:rgba(30,54,69,.28);backdrop-filter:blur(5px)}
+.room-overlay.open{display:flex}
+.room-panel-card{width:min(1180px,96vw);max-height:94vh;overflow:auto;border:1px solid rgba(255,255,255,.85);border-radius:24px;background:linear-gradient(145deg,rgba(255,255,255,.98),rgba(242,249,247,.98));box-shadow:0 24px 85px rgba(22,56,76,.28);color:#24465b}
+.room-panel-head{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid #dbe8e7;background:linear-gradient(90deg,#fff,#f1f8f7);border-radius:24px 24px 0 0}
+.room-panel-head strong{font-size:17px;letter-spacing:.3px;color:#20475f}
+.room-panel-head small{display:block;color:#73909b;font-size:10px;letter-spacing:1.1px;margin-top:3px}
+.room-panel-head .room-close{margin-left:auto;border:1px solid #cbdde0;background:#fff;color:#345c70;border-radius:20px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer}
+.room-panel-head .room-close:hover{background:#eaf7f8;border-color:#86cbd8}
+.room-model-content{padding:14px 16px 18px;display:flex;flex-direction:column;gap:12px}
+.room-model-content .scene-head{padding:4px 4px 0;color:#23475e}
+.room-model-content .scene-kicker{color:#4a9eac}
+.room-model-content .scene-title{color:#244e67}
+.room-model-content .scene-desc{color:#63808c}
+.room-model-content .scene-metrics .metric{background:#f0f7f5;border:1px solid #d9e9e5;color:#27546a}
+.room-model-content .metric b{color:#c38e31}.room-model-content .metric span{color:#66818b}
+.room-model-content .stage-wrap{height:min(52vh,520px);min-height:300px;flex:0 0 auto;border:1px solid #cadeda;border-radius:17px;background:radial-gradient(ellipse at 50% 45%,#f7fbf8,#e6f0ec 78%);box-shadow:inset 0 0 30px rgba(84,151,157,.08),0 8px 22px rgba(51,88,93,.08)}
+.room-model-content .stage-wrap:before,.room-model-content .stage-wrap:after{display:none}
+.room-model-content .room-shell{display:none}
+.room-model-content .stage-canvas{cursor:grab}
+.room-model-content .stage-hud{color:#527881}
+.room-model-content .toolbar{background:#f3f8f6;border:1px solid #d6e5e1}
+.room-model-content .tool-label,.room-model-content .hint{color:#64818b}
+.room-model-content .tool-btn{background:#fff;border:1px solid #d2e3e2;color:#315c70}
+.room-model-content .tool-btn.primary{background:linear-gradient(100deg,#e5f6f4,#eaf1ff);border-color:#a8d4d9;color:#245c70}
+.room-model-content .mode-card{background:#fff;border:1px solid #d5e4e2;color:#31566a;box-shadow:0 3px 10px rgba(37,77,87,.05)}
+.room-model-content .mode-card.selected{background:#eaf6f5;border-color:#74bcc8;box-shadow:0 0 0 2px rgba(91,185,198,.12)}
+.room-model-content .mode-name{color:#234d64}.room-model-content .mode-sub{color:#6b8791}
+.room-model-content .icon-btn{background:#fff;color:#386b7d;border:1px solid #cbdfe0}
+.room-model-content .toast{background:#fff;color:#2c596e;border-color:#a9d9df}
+.room-choice-card{width:min(960px,95vw);padding:24px;background:#f9fcfa;border:1px solid white;border-radius:25px;box-shadow:0 26px 90px rgba(29,66,81,.25)}
+.room-choice-title{font-size:23px;font-weight:850;color:#234b63;margin:0 0 6px}
+.room-choice-sub{font-size:13px;color:#6c8791;margin:0 0 20px}
+.room-choice-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.room-choice-option{border:1px solid #d5e5e2;border-radius:18px;overflow:hidden;background:#fff;text-align:left;color:#2c5267;cursor:pointer;transition:.2s;padding:0;box-shadow:0 5px 16px rgba(41,85,94,.07)}
+.room-choice-option:hover{transform:translateY(-4px);border-color:#82c7cf;box-shadow:0 12px 26px rgba(41,106,123,.14)}
+.room-choice-art{height:155px;display:grid;place-items:center;background:linear-gradient(135deg,#edf7f4,#edf3fb);font-size:76px;color:#397e99}
+.room-choice-art svg{width:100%;height:100%}
+.room-choice-copy{padding:14px 15px 16px}.room-choice-copy b{display:block;font-size:15px;margin-bottom:5px}.room-choice-copy span{font-size:11px;color:#718a94;line-height:1.6}
+.room-choice-enter{display:inline-flex;margin-top:10px;border-radius:18px;padding:7px 12px;background:#e8f6f5;color:#2f7484;font-size:11px;font-weight:800}
+.room-chat-panel{position:fixed;z-index:90;right:clamp(12px,2vw,28px);top:50%;transform:translateY(-50%) translateX(18px);width:min(390px,calc(100vw - 24px));height:min(790px,92vh);opacity:0;visibility:hidden;pointer-events:none;transition:.24s;filter:drop-shadow(0 20px 45px rgba(34,66,83,.22))}
+.room-chat-panel.open{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(-50%) translateX(0)}
+.room-chat-card{height:100%;display:flex;flex-direction:column;border:1px solid rgba(255,255,255,.9);border-radius:22px;overflow:hidden;background:rgba(255,255,255,.97);box-shadow:0 14px 48px rgba(29,64,81,.2)}
+.room-chat-top{height:48px;flex:0 0 48px;display:flex;align-items:center;padding:0 14px;background:linear-gradient(90deg,#e9f8f8,#eef3ff);border-bottom:1px solid #dce8e8;color:#28566b;font-size:13px;font-weight:800}
+.room-chat-top button{margin-left:auto;border:1px solid #c9dfe2;background:white;color:#386a7b;border-radius:50%;width:28px;height:28px;cursor:pointer}
+#roomChatSlot{min-height:0;flex:1;display:flex}
+#roomChatSlot .agent{width:100%;height:100%;min-height:0;border:0;border-radius:0;background:#fff;box-shadow:none;color:#294d60}
+#roomChatSlot .agent:before{display:none}
+#roomChatSlot .agent-head{padding:12px 14px 10px;border-bottom:1px solid #e6eeee}
+#roomChatSlot .agent-name{color:#224d64}
+#roomChatSlot .agent-role{color:#6c8791}
+#roomChatSlot .online{color:#399c82}
+#roomChatSlot .agent-intro{background:#f0f8f7;border-color:#d8eae6;color:#4c6e79}
+#roomChatSlot .agent-intro b{color:#244f65}
+#roomChatSlot .chat-log{background:#fbfdfc;scrollbar-color:#c7dedb transparent}
+#roomChatSlot .msg-label{color:#819aa1}
+#roomChatSlot .bot .bubble{background:#edf7f6;border:1px solid #deece9;color:#355c6c}
+#roomChatSlot .user .bubble{background:#e8f1ff;border:1px solid #d4e2f5;color:#315b77}
+#roomChatSlot .bubble strong{color:#1e607b}
+#roomChatSlot .bubble .math{background:#e2f2f2;color:#236c7e}
+#roomChatSlot .quick-asks{background:#fff;border-color:#e5eeee}
+#roomChatSlot .quick{background:#f3f8fa;border-color:#d8e8eb;color:#4a7283}
+#roomChatSlot .quick:hover{color:#1d6980;border-color:#8bcbd3}
+#roomChatSlot .chat-input{background:#fff;color:#264d62;border-color:#ccdedf}
+#roomChatSlot .chat-input::placeholder{color:#93a8ad}
+#roomChatSlot .send{background:linear-gradient(135deg,#65cfe0,#6e9ee2);color:white}
+#roomChatSlot .agent-foot{color:#81969e}
+.room-challenge-list{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+.room-challenge{border:1px solid #d7e7e4;border-radius:15px;padding:16px;background:#fff;color:#315b6d;text-align:left;cursor:pointer}
+.room-challenge b{display:block;font-size:14px;margin:8px 0 5px}.room-challenge span{font-size:11px;color:#738d96;line-height:1.6}.room-challenge em{font-style:normal;font-size:27px;color:#55aabb}
+/* Brighten the existing creation and reference windows to match the illustrated room. */
+#refsModal,#helpModal,#studioModal{background:rgba(45,72,84,.30);backdrop-filter:blur(7px)}
+#refsModal .modal-card,#helpModal .modal-card{background:linear-gradient(145deg,#ffffff,#f2f8f6);border:1px solid #d6e6e4;box-shadow:0 24px 75px rgba(26,66,81,.22);color:#294f63}
+#refsModal .modal-title,#helpModal .modal-title{color:#244d63}
+#refsModal .reference-card{background:#fff;border-color:#dce9e6}
+#refsModal .reference-card p,#helpModal .help-text{color:#577681}
+#helpModal .help-text h3{color:#2b7183}
+#refsModal .close,#helpModal .close{background:#f5faf9;border-color:#d2e4e1;color:#315b6c}
+#studioModal .studio-card{background:linear-gradient(145deg,#fbfdfb,#edf5f3);border:1px solid #ccdfdc;box-shadow:0 24px 85px rgba(26,62,77,.26);color:#2c5264}
+#studioModal .studio-head{background:#f6fbf9;border-color:#dce9e5;color:#244d63}
+#studioModal .studio-head small{color:#708b94}
+#studioModal .studio-head .tag{background:#edf8f6;border-color:#c8e4e1;color:#397b88}
+#studioModal .studio-side{background:#f5faf8;border-color:#dce9e5}
+#studioModal .studio-section-title{color:#347f8d}
+#studioModal .studio-subtitle{color:#68838d}
+#studioModal .studio-shape{background:#fff;border-color:#d8e7e4;color:#315a6d}
+#studioModal .studio-shape .shape-glyph{color:#388fa3;text-shadow:none}
+#studioModal .studio-op,#studioModal .studio-toolbar button{background:#fff;border-color:#d4e4e1;color:#3d6373}
+#studioModal .studio-main{background:#f7fbf9}
+#studioModal .creator-board-wrap{background:linear-gradient(145deg,#f9fcfa,#eaf3ef);border-color:#cddfd9}
+#studioModal .creator-board-note{color:#6e8b91}
+#studioModal .creator-status{color:#67838a}
+#studioModal .creator-status b{color:#285b6d}
+#studioModal .studio-info{color:#6c8891}
+#studioModal .angle-result{background:#edf7f5;border-color:#d5e7e2;color:#345e6b}
+#studioModal .angle-total b{color:#2b7d8c}
+#studioModal .disclaimer{color:#70878e;border-color:#dce9e5}
+#studioModal .studio-side select{background:#fff;color:#315568;border-color:#d3e4e1}
+#geometryReport{background:#f1f8f5;border-color:#cfe3dc;color:#31596a}
+#geometryReport .geometry-head{color:#2b7380}
+#geometryReport .geometry-summary{color:#3c6473}
+#geometryReport .geometry-detail{color:#66828b}
+#geometryReport .geometry-summary strong{color:#1f6677}
+#studioModal .disclaimer{border-top-color:#d7e5e2}
+@media(max-width:900px){
+ .room-hotspot-label{display:none}
+ .room-panel-card{max-height:96vh}
+ .room-model-content .stage-wrap{height:42vh;min-height:260px}
+ .room-choice-grid{gap:9px}.room-choice-art{height:120px;font-size:58px}
+ .room-chat-panel{right:10px;top:auto;bottom:10px;transform:translateY(15px);height:min(680px,88vh)}
+ .room-chat-panel.open{transform:translateY(0)}
+}
+@media(max-width:620px){
+ #polylab-room .room-backdrop{object-position:center center}
+ .hit-nav-1,.hit-nav-2,.hit-nav-3,.hit-nav-4{left:85%;width:14%;}
+ .hit-sample-3{left:27%;width:6%}
+ .room-choice-grid{grid-template-columns:1fr}
+ .room-choice-art{height:86px;font-size:44px}
+ .room-choice-card{padding:16px;max-height:94vh;overflow:auto}
+ .room-choice-title{font-size:19px}
+ .room-challenge-list{grid-template-columns:1fr}
+ .room-panel-head{padding:12px 14px}
+ .room-model-content{padding:9px}
+ .room-model-content .scene-head{display:block}
+ .room-model-content .scene-metrics{margin-top:10px}
+}
+
+</style>
+</head>
+<body class="room-body">
+<div id="polylab-room" aria-label="立体密铺实验室沉浸式空间">
+  <img class="room-backdrop" src="assets/polylab-room.png" alt="明亮的立体密铺实验室：几何穹顶、全景窗、密铺展示墙、中央全息展台和拓拓机器人" draggable="false">
+  <div class="room-hotspot-label">点击墙面展品、中央模型或右侧入口，开始探索</div>
+  <div class="room-hit-layer">
+    <button class="room-hit hit-sample-1" data-room-mode="0" aria-label="进入五边形与菱形组合密铺"><span class="hit-label">五边形＋菱形</span></button>
+    <button class="room-hit hit-sample-2" data-room-mode="1" aria-label="进入正五边形嵌入单元"><span class="hit-label">正五边形嵌入</span></button>
+    <button class="room-hit hit-sample-3" data-room-mode="2" aria-label="进入足球五边形与六边形结构"><span class="hit-label">足球立体结构</span></button>
+    <button class="room-hit hit-center-model" id="openCentralModel" aria-label="打开中央立体密铺模型互动观察"><span class="hit-label">打开立体模型 · 拖动旋转</span></button>
+    <button class="room-hit hit-robot" id="openTotoChat" aria-label="与拓拓密铺AI伙伴对话"><span class="hit-label">和拓拓聊一聊</span></button>
+    <button class="room-hit hit-nav-1" id="openRoomChoices" aria-label="选择三种密铺主题"><span class="hit-label">选择一种密铺主题</span></button>
+    <button class="room-hit hit-nav-2" id="openRoomStudio" aria-label="进入自由创作"><span class="hit-label">自由摆放和组合图形</span></button>
+    <button class="room-hit hit-nav-3" id="openRoomGeometry" aria-label="进入几何密铺检测"><span class="hit-label">检测空隙、重叠和顶点</span></button>
+    <button class="room-hit hit-nav-4" id="openRoomChallenges" aria-label="进入密铺挑战任务"><span class="hit-label">开始挑战</span></button>
+    <button class="room-hit hit-bench" id="openBenchStudio" aria-label="使用前景几何拼搭桌进入自由创作"><span class="hit-label">在拼搭桌上开始创作</span></button>
+  </div>
+</div>
+<div class="room-chat-panel" id="roomChatPanel" aria-label="拓拓对话窗口">
+  <div class="room-chat-card"><div class="room-chat-top">🤖 拓拓 · 密铺AI伙伴<button id="closeRoomChat" aria-label="关闭对话">×</button></div><div id="roomChatSlot"></div></div>
+</div>
+<div class="engine-sandbox" aria-hidden="true">
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><div class="brand-mark"></div><div><div class="brand-title">立体密铺实验室</div><div class="brand-sub">POLYLAB · SPATIAL TESSELLATION STUDIO</div></div></div>
+    <div class="top-center"><span class="spark">✧</span> 图形相接 · 连续重复 · 铺满空间</div>
+    <div class="top-actions"><span class="tag">● 密铺探索空间</span><button class="top-btn" id="studioBtn">✦ 自由创作</button><button class="top-btn" id="refsBtn">纹样灵感</button><button class="top-btn" id="helpBtn">操作指南</button></div>
+  </header>
+  <main class="main">
+    <section class="workspace">
+      <div class="scene-head">
+        <div><div class="scene-kicker" id="sceneKicker">EXPERIMENT 01 / PLANE TILING</div><div class="scene-title" id="sceneTitle">五边形 × 菱形 · 平面复合密铺</div><div class="scene-desc" id="sceneDesc">观察两种图形如何协作，让顶点周围严丝合缝地补满 360°。</div></div>
+        <div class="scene-metrics"><div class="metric"><b id="metricA">108°</b><span id="metricALabel">正五边形内角</span></div><div class="metric"><b id="metricB">72°</b><span id="metricBLabel">菱形锐角</span></div><div class="metric"><b id="metricC">360°</b><span id="metricCLabel">顶点完整角</span></div></div>
+      </div>
+      <div class="stage-wrap room-stage" id="stageWrap">
+        <div class="room-shell" aria-hidden="true">
+<svg class="room-architecture" viewBox="0 0 1600 900" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <linearGradient id="ceilingPearl" x2="0" y2="1"><stop stop-color="#fffdf8"/><stop offset=".7" stop-color="#f2eee5"/><stop offset="1" stop-color="#d9ded5"/></linearGradient>
+  <linearGradient id="wallIvory" x2="0" y2="1"><stop stop-color="#f9f7ef"/><stop offset=".62" stop-color="#eeeae0"/><stop offset="1" stop-color="#d8ded5"/></linearGradient>
+  <linearGradient id="sideWallL"><stop stop-color="#d8ded4"/><stop offset="1" stop-color="#f0ece2"/></linearGradient>
+  <linearGradient id="sideWallR" x2="1"><stop stop-color="#e8e5db"/><stop offset="1" stop-color="#d1ddd5"/></linearGradient>
+  <linearGradient id="floorStone" x2="0" y2="1"><stop stop-color="#e8e3d7"/><stop offset=".55" stop-color="#d8d9ce"/><stop offset="1" stop-color="#c6d2c8"/></linearGradient>
+  <linearGradient id="glassSky" x2="0" y2="1"><stop stop-color="#9fd1e3"/><stop offset=".58" stop-color="#d7edf0"/><stop offset="1" stop-color="#c4dccc"/></linearGradient>
+  <linearGradient id="wood" x2="0" y2="1"><stop stop-color="#b78e63"/><stop offset="1" stop-color="#806143"/></linearGradient>
+  <linearGradient id="plinthSide" x2="0" y2="1"><stop stop-color="#e7e6dc"/><stop offset="1" stop-color="#b8c7bd"/></linearGradient>
+  <linearGradient id="plinthTop" x2="0" y2="1"><stop stop-color="#fffef8"/><stop offset="1" stop-color="#dce8df"/></linearGradient>
+  <pattern id="ceilingHoney" width="180" height="156" patternUnits="userSpaceOnUse">
+    <path d="M45 2H135L178 78L135 154H45L2 78Z" fill="#f8f5ec" stroke="#c9d7d0" stroke-width="3"/>
+    <path d="M45 2H135L90 78Z" fill="#d8e9e8" opacity=".9"/>
+    <path d="M90 78L135 154H45Z" fill="#e8d6ae" opacity=".85"/>
+    <path d="M2 78L45 2L90 78L45 154Z" fill="#f4f0e6" stroke="#d1c7b4" stroke-width="1.5"/>
+  </pattern>
+  <pattern id="floorHex" width="180" height="156" patternUnits="userSpaceOnUse" patternTransform="matrix(1 .07 -.2 .82 0 0)">
+    <path d="M45 2H135L178 78L135 154H45L2 78Z" fill="#f4f0e5" stroke="#c7c9bd" stroke-width="3"/>
+    <path d="M45 2H135L90 78Z" fill="#dbe9e5" stroke="#c4d2ca" stroke-width="1.5"/>
+    <path d="M90 78L135 154H45Z" fill="#e7d7b9" stroke="#d4c5a7" stroke-width="1.5"/>
+    <path d="M178 78L135 154L90 78L135 2Z" fill="#e6ece5" stroke="#c7d4cb" stroke-width="1.5"/>
+  </pattern>
+  <pattern id="pentRhombus" width="126" height="108" patternUnits="userSpaceOnUse">
+    <rect width="126" height="108" fill="#f6efdc"/>
+    <path d="M63 4L91 24L80 57L63 70L46 57L35 24Z" fill="#c47a56" stroke="#9b644b" stroke-width="2"/>
+    <path d="M35 24L63 4L46 57L0 54Z" fill="#d7b56e" stroke="#b69557" stroke-width="1.6"/>
+    <path d="M91 24L126 54L80 57L63 4Z" fill="#9abfc3" stroke="#739fa4" stroke-width="1.6"/>
+    <path d="M0 54L46 57L63 104L18 83Z" fill="#aec9bd" stroke="#8fae9e" stroke-width="1.6"/>
+    <path d="M80 57L126 54L108 83L63 104Z" fill="#d7b56e" stroke="#b69557" stroke-width="1.6"/>
+    <path d="M46 57L80 57L63 104Z" fill="#f1e4c5" stroke="#c8ad78" stroke-width="1.6"/>
+  </pattern>
+  <pattern id="squarePentagon" width="124" height="124" patternUnits="userSpaceOnUse">
+    <rect width="124" height="124" fill="#f4f2e9"/>
+    <rect x="3" y="3" width="118" height="118" fill="#e5efeb" stroke="#8daaa3" stroke-width="3"/>
+    <path d="M62 17L100 45L86 91L38 91L24 45Z" fill="#d9a15e" stroke="#ad7848" stroke-width="2.5"/>
+    <path d="M62 17L62 62L24 45Z" fill="#eacb91" opacity=".85"/>
+    <path d="M62 62L100 45L86 91Z" fill="#8fb5bd" opacity=".9"/>
+    <path d="M62 62L86 91L38 91Z" fill="#c98263" opacity=".88"/>
+  </pattern>
+  <pattern id="diamondLattice" width="90" height="78" patternUnits="userSpaceOnUse">
+    <rect width="90" height="78" fill="#edf1e9"/>
+    <path d="M45 0L90 39L45 78L0 39Z" fill="none" stroke="#a4b8aa" stroke-width="4"/>
+    <path d="M45 0L45 78M0 39H90" stroke="#d0a56b" stroke-width="2"/>
+    <path d="M45 0L90 39L45 39Z" fill="#9dc4c7" opacity=".55"/>
+  </pattern>
+  <clipPath id="windowClip"><rect x="440" y="215" width="720" height="270" rx="10"/></clipPath>
+  <filter id="softShadow" x="-30%" y="-30%" width="160%" height="180%"><feGaussianBlur stdDeviation="16"/></filter>
+  <filter id="tileShadow" x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="9" stdDeviation="8" flood-color="#536c62" flood-opacity=".18"/></filter>
+</defs>
+<!-- daylight room shell -->
+<rect width="1600" height="900" fill="#e9e9df"/>
+<!-- ceiling plane -->
+<path d="M0 0H1600V190L1390 230H210L0 190Z" fill="url(#ceilingPearl)"/>
+<path d="M260 0H1340L1190 168H410Z" fill="url(#ceilingHoney)" opacity=".95"/>
+<path d="M260 0H1340L1190 168H410Z" fill="none" stroke="#b9c8bf" stroke-width="8"/>
+<path d="M0 185L210 230H1390L1600 185" fill="none" stroke="#b5c3b9" stroke-width="10"/>
+<path d="M0 197L210 242H1390L1600 197" fill="none" stroke="#fffdf7" stroke-width="4"/>
+<!-- side walls -->
+<path d="M0 155L210 190V620L0 720Z" fill="url(#sideWallL)"/>
+<path d="M1600 155L1390 190V620L1600 720Z" fill="url(#sideWallR)"/>
+<path d="M0 155L210 190V620L0 720Z" fill="url(#diamondLattice)" opacity=".2"/>
+<path d="M1600 155L1390 190V620L1600 720Z" fill="url(#squarePentagon)" opacity=".18"/>
+<!-- rear wall -->
+<rect x="190" y="168" width="1220" height="455" rx="4" fill="url(#wallIvory)" stroke="#c9d2c8" stroke-width="5"/>
+<path d="M190 183H1410M190 604H1410" stroke="#fffdf7" stroke-width="8" opacity=".8"/>
+<path d="M210 190V604M1390 190V604" stroke="#c6d0c6" stroke-width="4"/>
+<!-- panoramic windows and garden/city -->
+<g clip-path="url(#windowClip)">
+ <rect x="440" y="215" width="720" height="270" fill="url(#glassSky)"/>
+ <circle cx="1050" cy="270" r="48" fill="#fff4d7" opacity=".7"/>
+ <path d="M440 385L500 320L550 366L610 300L675 370L736 320L795 372L862 305L926 375L984 330L1040 376L1100 315L1160 370V485H440Z" fill="#a9c6b8" opacity=".42"/>
+ <path d="M440 405L505 355L555 393L610 342L665 397L725 350L785 402L840 346L900 397L960 354L1020 402L1080 350L1160 400V485H440Z" fill="#81ae99" opacity=".52"/>
+ <g fill="#87a9a0" opacity=".75">
+  <rect x="470" y="345" width="32" height="112"/><rect x="510" y="370" width="26" height="87"/><rect x="558" y="330" width="38" height="127"/>
+  <rect x="1010" y="350" width="34" height="107"/><rect x="1052" y="326" width="45" height="131"/><rect x="1104" y="368" width="35" height="89"/>
+ </g>
+ <path d="M440 450Q610 420 770 454T1160 444V485H440Z" fill="#87b49a" opacity=".72"/>
+ <path d="M440 468H1160" stroke="#f5f3e8" stroke-width="5" opacity=".8"/>
+</g>
+<rect x="430" y="205" width="740" height="290" rx="12" fill="none" stroke="#b2c3bb" stroke-width="12"/>
+<path d="M670 210V490M930 210V490M440 350H1160" stroke="#fbfaf4" stroke-width="7" opacity=".95"/>
+<path d="M675 210V490M935 210V490" stroke="#a9bcb5" stroke-width="2" opacity=".8"/>
+<!-- left framed tessellation artwork -->
+<g filter="url(#tileShadow)">
+ <rect x="225" y="245" width="175" height="218" rx="7" fill="#fffdf7" stroke="#bda77f" stroke-width="8"/>
+ <rect x="238" y="258" width="149" height="192" fill="url(#pentRhombus)"/><image href="assets/pentagon-rhombus-reference.png" x="238" y="258" width="149" height="192" preserveAspectRatio="xMidYMid slice" opacity=".96"/>
+ <path d="M225 470H400" stroke="#a9865c" stroke-width="8"/>
+ <rect x="250" y="485" width="125" height="9" rx="4" fill="#b8c5b9"/>
+</g>
+<!-- right square-with-pentagon inset artwork -->
+<g filter="url(#tileShadow)">
+ <rect x="1200" y="222" width="175" height="144" rx="7" fill="#fffdf7" stroke="#bda77f" stroke-width="8"/>
+ <rect x="1213" y="235" width="149" height="118" fill="url(#squarePentagon)"/>
+ <path d="M1200 373H1375" stroke="#a9865c" stroke-width="8"/>
+ <rect x="1200" y="380" width="175" height="150" rx="7" fill="#fffdf7" stroke="#bda77f" stroke-width="8"/>
+ <rect x="1213" y="393" width="149" height="124" fill="#edf0e8"/>
+ <circle cx="1287" cy="455" r="51" fill="#e8ece5" stroke="#9eafa5" stroke-width="3"/>
+ <path d="M1287 423L1308 439L1301 464L1273 464L1266 439Z" fill="#40545a" stroke="#fffdf7" stroke-width="3"/>
+ <path d="M1287 423L1287 400L1311 407L1320 427L1308 439Z" fill="#fffdf7" stroke="#9eaaa0" stroke-width="2"/>
+ <path d="M1308 439L1338 436L1343 460L1328 479L1301 464Z" fill="#fffdf7" stroke="#9eaaa0" stroke-width="2"/>
+ <path d="M1301 464L1328 479L1314 503L1287 510L1273 485Z" fill="#fffdf7" stroke="#9eaaa0" stroke-width="2"/>
+ <path d="M1273 464L1273 485L1248 501L1231 482L1236 455L1266 439Z" fill="#fffdf7" stroke="#9eaaa0" stroke-width="2"/>
+ <path d="M1266 439L1236 455L1234 429L1250 408L1272 400L1287 423Z" fill="#fffdf7" stroke="#9eaaa0" stroke-width="2"/>
+ <path d="M1240 425Q1284 384 1331 420" fill="none" stroke="#fff" stroke-width="5" opacity=".55"/>
+</g>
+<!-- low side display niches with repeating geometric samples -->
+<g opacity=".92">
+ <path d="M32 360L170 380V575L32 610Z" fill="#f8f6ed" stroke="#c8d0c6" stroke-width="5"/>
+ <path d="M48 383L153 397V548L48 575Z" fill="url(#diamondLattice)" stroke="#c0b49d" stroke-width="5"/>
+ <path d="M1430 380L1568 360V610L1430 575Z" fill="#f9f6ed" stroke="#c8d0c6" stroke-width="5"/>
+ <path d="M1447 397L1552 383V575L1447 548Z" fill="url(#diamondLattice)" stroke="#c0b49d" stroke-width="5"/>
+</g>
+<!-- small sculptural samples on side shelves -->
+<path d="M20 635L220 604L220 625L20 662Z" fill="#c5a37a"/><path d="M1380 604L1580 635V662L1380 625Z" fill="#c5a37a"/>
+<g filter="url(#tileShadow)">
+ <polygon points="92,553 128,533 164,553 164,594 128,615 92,594" fill="#7eaeb0" stroke="#fff7e8" stroke-width="4"/>
+ <polygon points="1480,548 1518,527 1554,550 1544,590 1507,610 1472,587" fill="#d5a35f" stroke="#fff7e8" stroke-width="4"/>
+</g>
+<!-- side foliage for warmth -->
+<g fill="#6f987f" opacity=".7">
+ <path d="M55 565Q15 520 42 475Q75 502 55 565M65 565Q55 510 94 486Q108 532 65 565M72 560Q103 510 137 525Q116 562 72 560"/>
+ <path d="M1510 565Q1470 520 1497 475Q1530 502 1510 565M1520 565Q1510 510 1549 486Q1563 532 1520 565M1527 560Q1558 510 1592 525Q1571 562 1527 560"/>
+</g>
+<!-- perspective tessellated floor -->
+<path d="M0 520L1600 520L1450 900H150Z" fill="url(#floorStone)"/>
+<path d="M0 520L1600 520L1450 900H150Z" fill="url(#floorHex)" opacity=".84"/>
+<path d="M0 520L1600 520" stroke="#b9c6bc" stroke-width="8"/>
+<path d="M150 900L0 520M1450 900L1600 520" stroke="#b4c0b7" stroke-width="5" opacity=".6"/>
+<!-- warm inset tile bands -->
+<path d="M180 850L340 545L440 545L320 900Z" fill="#d5b47b" opacity=".23"/>
+<path d="M1420 850L1260 545L1160 545L1280 900Z" fill="#84b8b4" opacity=".24"/>
+<path d="M220 740L340 680L400 740L340 800Z" fill="#d8b16c" opacity=".65" stroke="#fff8ea" stroke-width="4"/>
+<path d="M1380 740L1260 680L1200 740L1260 800Z" fill="#8bb8b5" opacity=".68" stroke="#fff8ea" stroke-width="4"/>
+<!-- hexagonal presentation dais: facets derived from the tessellation system -->
+<ellipse cx="800" cy="770" rx="370" ry="76" fill="#687d70" opacity=".18" filter="url(#softShadow)"/>
+<path d="M470 662L625 600H975L1130 662L975 755H625Z" fill="#b5c7bc" stroke="#f9f7ef" stroke-width="8"/>
+<path d="M470 662L625 755V808L470 714Z" fill="#b7c7bd"/>
+<path d="M625 755H975V808H625Z" fill="#d2d9cf"/>
+<path d="M975 755L1130 662V714L975 808Z" fill="#a9bcb0"/>
+<path d="M625 600H975L1130 662L975 725H625L470 662Z" fill="url(#plinthTop)" stroke="#93aa9d" stroke-width="5"/>
+<path d="M625 600H975L1130 662L975 725H625L470 662Z" fill="url(#diamondLattice)" opacity=".22"/>
+<path d="M625 616H975L1094 662L975 709H625L506 662Z" fill="none" stroke="#d0ae75" stroke-width="5"/>
+<path d="M625 755H975M470 714L625 808M1130 714L975 808" fill="none" stroke="#91a99c" stroke-width="3" opacity=".8"/>
+<path d="M625 780H975" stroke="#f9f5e9" stroke-width="4" opacity=".9"/>
+<!-- embedded hexagon motif on pedestal front -->
+<g transform="translate(800 779)">
+ <polygon points="0,-23 21,-11 21,12 0,24 -21,12 -21,-11" fill="#e4eee7" stroke="#91aaa0" stroke-width="2"/>
+ <polygon points="0,-14 13,-7 13,7 0,14 -13,7 -13,-7" fill="#d9b778" opacity=".95"/>
+</g>
+<!-- ceiling and floor light reflections -->
+<path d="M320 180H470M1130 180H1280" stroke="#fffaf0" stroke-width="10" stroke-linecap="round" opacity=".9"/>
+<path d="M350 520H1250" stroke="#fffef7" stroke-width="3" opacity=".65"/>
+</svg>
+</div><div class="podium-ring"></div></div>
+        <canvas class="stage-canvas" id="sceneCanvas" aria-label="置于空间实验室中央展台上的立体密铺模型，可拖动旋转"></canvas>
+        <div class="stage-hud hud-left"><span class="axis"></span>立体图形观察<br><span style="margin-left:14px;color:#718b84">拖动旋转 · 滚轮缩放</span></div>
+        <div class="stage-hud hud-right" id="hudRight">图形结构 · 边线相接<br><span style="color:#718b84">空间视角 · 可旋转观察</span></div>
+        <div class="stage-hud hud-bottom" id="hudBottom">从边线到顶点，观察图形怎样连续铺展</div>
+        <div class="toast" id="toast"></div>
+        <div class="stage-controls"><button class="icon-btn" id="zoomOut" title="缩小">−</button><button class="icon-btn" id="zoomIn" title="放大">＋</button><button class="icon-btn" id="resetView" title="重置视角">⌂</button></div>
+      </div>
+      <div class="toolbar" id="toolbar">
+        <span class="tool-label">模型互动</span>
+        <button class="tool-btn primary" id="actionMain">▶ 自动铺展</button>
+        <button class="tool-btn" id="actionAdd">＋ 添加图块</button>
+        <button class="tool-btn" id="actionAlt">◇ 切换图形</button>
+        <span class="tool-spacer"></span><span class="hint" id="toolHint">拖动中央模型，观察不同方向的拼接关系</span>
+      </div>
+      <div class="mode-row" aria-label="选择创作空间">
+        <button class="mode-card selected" data-mode="0"><div class="mode-icon">⬡</div><div><div class="mode-number">01 · PLANE</div><div class="mode-name">五边形＋菱形</div><div class="mode-sub">平面复合密铺</div></div></button>
+        <button class="mode-card" data-mode="1"><div class="mode-icon">▦</div><div><div class="mode-number">02 · PATTERN</div><div class="mode-name">五边形嵌入式</div><div class="mode-sub">方形 / 长方形单元</div></div></button>
+        <button class="mode-card" data-mode="2"><div class="mode-icon">⚽</div><div><div class="mode-number">03 · SPHERE</div><div class="mode-name">足球立体结构</div><div class="mode-sub">五边形＋六边形球面</div></div></button>
+      </div>
+    </section>
+    <aside class="agent">
+      <div class="agent-head">
+        <div class="agent-profile"><div class="avatar"><div class="orbit"></div><div class="orbit two"></div><div class="avatar-core"></div><div class="avatar-dot"></div></div><div><div class="agent-name">拓拓 · 密铺 AI 伙伴</div><div class="agent-role">你的 3D 数学探索向导</div><div class="online">在线 · 密铺知识库已载入</div></div></div>
+        <div class="agent-intro"><b>你好，我是拓拓！</b><br>你可以像和老师聊天一样问我：图形能不能密铺？为什么？怎样改造？我会结合左侧沙盘，陪你一步步发现规律。</div>
+      </div>
+      <div class="chat-log" id="chatLog" aria-live="polite">
+        <div class="msg bot"><div class="msg-label">拓拓 · 刚刚</div><div class="bubble">欢迎来到立体密铺实验室！✨<br>我们准备了三种创作空间：<strong>五边形＋菱形、五边形嵌入式、足球球面结构</strong>。<br><br>先选一种开始探索吧！也可以直接问我：“正五边形能不能密铺？”</div></div>
+      </div>
+      <div class="quick-asks"><button class="quick">正五边形能单独密铺吗？</button><button class="quick">第一种为什么能密铺？</button><button class="quick">足球为什么有五边形？</button><button class="quick">第二种到底是谁在密铺？</button></div>
+      <form class="chat-entry" id="chatForm"><input class="chat-input" id="chatInput" autocomplete="off" placeholder="输入你的问题，和拓拓聊一聊…" /><button class="send" type="submit" aria-label="发送">➤</button></form>
+      <div class="agent-foot">当前为 <span>本地密铺知识智能体</span> · 无需联网即可体验</div>
+    </aside>
+  </main>
+</div>
+</div>
+<div class="modal" id="refsModal"><div class="modal-card"><div class="modal-head"><div class="modal-title">纹样灵感 · 从生活纹样到几何结构</div><button class="close" data-close>关闭</button></div><div class="reference-grid"><div class="reference-card"><img src="assets/pentagon-rhombus-reference.png" alt="五边形与菱形组合纹样参考图"><h3>参考 A · 五边形与菱形组合纹样</h3><p>用不同图形协同补足顶点周围的角度，探索混合图形密铺。进入第一种创作空间，观察正五边形与菱形的组合关系。</p></div><div class="reference-card"><img src="assets/window-pattern-inspiration.jpg" alt="中国古窗纹样图鉴"><h3>参考 B · 中国古窗纹样图鉴</h3><p>从方格纹、菱形纹、冰裂纹、龟背纹等传统窗棂中寻找重复、对称、嵌套与组合的设计灵感。</p></div></div></div></div>
+<div class="modal" id="helpModal"><div class="modal-card"><div class="modal-head"><div class="modal-title">操作指南 · 怎样玩转立体密铺实验室</div><button class="close" data-close>关闭</button></div><div class="help-text"><h3>① 选择一种创作空间</h3>点击下方三张卡片，在三种密铺主题之间切换。场景中的模型会随主题变化。<h3>② 操作立体沙盘</h3>在模型区域按住鼠标或手指拖动，可以旋转观察；滚轮或右下角 + / − 可以缩放；⌂ 恢复初始视角。<h3>③ 动手改变结构</h3>第一种可以添加五边形或菱形并重新铺展；第二种可以在方形和长方形单元之间切换，并增加嵌入的五边形；第三种可以旋转足球模型、拆解观察球面图块。<h3>④ 自由创作工作台</h3>点击顶部“自由创作”，可以添加正三角形、正方形、正五边形、正六边形和菱形；拖动图形调整位置，旋转、复制或删除。用“顶点角度检验”将同一顶点处的内角相加；点击“AI 密铺检测”，还可以检查实际摆放的图形是否面积重叠、是否形成公共边，以及内部顶点是否补足 360°。右侧工具栏提供 2×2 对齐、留出空位和发生重叠三种对照示例。<h3>⑤ 向拓拓提问</h3>拓拓内置了本实验的核心数学知识，会回答正五边形与菱形组合、方形单元嵌入、足球球面结构等问题。你也可以用自己的话继续追问。</div><div class="disclaimer">说明：当前交付版本内置本地知识智能体，不需要网络或 API 密钥即可围绕本实验对话；它不是通用大语言模型，超出密铺主题的问题会提示回到本实验。若要实现像 ChatGPT 一样的开放式自由问答，需要后续接入有权限的模型服务。</div></div></div>
+
+<div class="modal studio-modal" id="studioModal" aria-label="自由创作工作台">
+  <div class="studio-card">
+    <div class="studio-head"><div><strong>✦ 自由创作工作台</strong><br><small>POLYLAB / BUILD · MOVE · ROTATE · TEST</small></div><span class="tag">本地创作 · 当前页面会话内保留</span><button class="close" id="studioClose">返回实验室</button></div>
+    <aside class="studio-side">
+      <div class="studio-section-title">01 / 选择图形材料</div>
+      <div class="studio-subtitle">点击图形，把它放到中央实验台。选中图形后可拖动、旋转、复制或删除。</div>
+      <div class="studio-shapes">
+        <button class="studio-shape" data-add-shape="triangle"><span class="shape-glyph">△</span>正三角形</button>
+        <button class="studio-shape" data-add-shape="square"><span class="shape-glyph">□</span>正方形</button>
+        <button class="studio-shape" data-add-shape="pentagon"><span class="shape-glyph">⬠</span>正五边形</button>
+        <button class="studio-shape" data-add-shape="hexagon"><span class="shape-glyph">⬡</span>正六边形</button>
+        <button class="studio-shape" data-add-shape="rhombus"><span class="shape-glyph">◇</span>菱形</button>
+      </div>
+      <div class="studio-ops">
+        <button class="studio-op" id="rotateTile">↻ 旋转 15°</button>
+        <button class="studio-op" id="duplicateTile">▣ 复制</button>
+        <button class="studio-op danger" id="deleteTile">⌫ 删除</button>
+        <button class="studio-op danger" id="clearTiles">清空实验台</button>
+      </div>
+      <div class="studio-separator"></div>
+      <div class="studio-section-title">02 / 顶点角度检验</div>
+      <div class="studio-subtitle">把准备在同一个顶点相遇的内角放进来，检查总和是否为 360°。</div>
+      <div class="angle-select-row">
+        <select id="anglePicker" aria-label="选择一个内角">
+          <option value="60|正三角形">正三角形 · 60°</option>
+          <option value="90|正方形">正方形 · 90°</option>
+          <option value="108|正五边形">正五边形 · 108°</option>
+          <option value="120|正六边形">正六边形 · 120°</option>
+          <option value="72|菱形锐角">菱形锐角 · 72°</option>
+          <option value="108|菱形钝角">菱形钝角 · 108°</option>
+        </select>
+        <button class="studio-op" id="addAngle">＋ 加入</button>
+      </div>
+      <div class="angle-chips" id="angleChips"><span class="studio-subtitle">还没有添加角，选择上方图形开始检验。</span></div>
+      <div class="angle-result">
+        <div class="angle-total"><b id="angleTotal">0°</b><span>/ 360°</span></div>
+        <div class="angle-status" id="angleStatus">添加角度后，这里会显示是否存在空隙或重叠。</div>
+      </div>
+      <div class="angle-presets">
+        <button data-angle-preset="triangle">6 个 60°</button>
+        <button data-angle-preset="square">4 个 90°</button>
+        <button data-angle-preset="hexagon">3 个 120°</button>
+        <button data-angle-preset="mix">2 个 108°＋2 个 72°</button>
+      </div>
+      <div class="disclaimer">提醒：角度和为 360° 是平面密铺的顶点条件之一，不代表图形一定能密铺。还要检查边长能否对应、边界是否吻合，以及能否持续重复铺展。</div>
+    </aside>
+    <main class="studio-main">
+      <div class="studio-toolbar">
+        <button class="studio-primary" id="studioSnap">⌗ 网格吸附：开</button><button class="studio-primary" id="runTilingCheck">✧ AI 密铺检测</button><button id="sampleGood">示例：2×2 对齐</button><button id="sampleGap">示例：留出空位</button><button id="sampleOverlap">示例：发生重叠</button>
+        <button id="studioResetView">◎ 实验台归位</button>
+        <span class="studio-spacer"></span>
+        <button id="exportDesign">⇩ 导出作品图</button>
+        <button id="saveDesign">保存设计数据</button>
+      </div>
+      <div class="creator-board-wrap">
+        <svg id="creatorBoard" viewBox="0 0 760 520" role="img" aria-label="中央空间实验台上的图形摆放区域">
+          <defs>
+            <pattern id="creatorGrid" width="25" height="25" patternUnits="userSpaceOnUse"><path d="M 25 0 L 0 0 0 25" fill="none" stroke="rgba(115,166,239,.13)" stroke-width="1"/></pattern>
+            <pattern id="creatorBigGrid" width="100" height="100" patternUnits="userSpaceOnUse"><rect width="100" height="100" fill="url(#creatorGrid)"/><path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(115,166,239,.2)" stroke-width="1.2"/></pattern>
+          </defs>
+          <rect x="0" y="0" width="760" height="520" fill="url(#creatorBigGrid)"/>
+          <rect x="12" y="12" width="736" height="496" rx="10" fill="none" stroke="rgba(100,205,255,.22)" stroke-width="1.3"/>
+          <g id="creatorTiles"></g>
+          <g id="geometryMarks"></g>
+          <g id="creatorEmptyHint" pointer-events="none"><text x="380" y="240" text-anchor="middle" fill="#8ba6d2" font-size="16">选择实验材料，放到中央工作台</text><text x="380" y="268" text-anchor="middle" fill="#627ca9" font-size="11">操作台 · 拖动 · 旋转 · 复制 · 检验</text></g>
+        </svg>
+        <div class="creator-board-note">SPATIAL WORKBENCH / 760 × 520 · 在实体实验台上组合图形</div>
+      </div>
+      <div class="creator-status"><span><i class="status-dot"></i><b id="tileCount">0</b> 个图形</span><span id="selectedTileInfo">尚未选中图形</span><span id="snapInfo">网格吸附已开启 · 顶点智能吸附</span></div><div id="geometryReport" aria-live="polite"><div class="geometry-head">✧ 拓拓几何检测报告 <span class="geometry-pill">等待检测</span></div><div class="geometry-summary">摆放图形后点击“AI 密铺检测”，我会检查面积重叠、公共边和内部顶点角度。</div></div>
+    </main>
+  </div>
+</div>
+
+<script>
+(()=>{
+'use strict';
+const canvas=document.getElementById('sceneCanvas'),ctx=canvas.getContext('2d');
+const state={mode:0,yaw:-.42,pitch:.55,zoom:1,drag:false,lastX:0,lastY:0,extra:0,alt:false,auto:false,explode:false,anim:0,shape:'pentagon',lastTime:0};
+const $=id=>document.getElementById(id);
+const TAU=Math.PI*2,phi=(1+Math.sqrt(5))/2;
+let W=900,H=520,DPR=1,resizeObserver;
+function sizeCanvas(){const r=canvas.getBoundingClientRect();W=Math.max(300,r.width);H=Math.max(240,r.height);DPR=Math.min(2,window.devicePixelRatio||1);canvas.width=Math.round(W*DPR);canvas.height=Math.round(H*DPR);ctx.setTransform(DPR,0,0,DPR,0,0);draw();}
+if('ResizeObserver'in window){resizeObserver=new ResizeObserver(sizeCanvas);resizeObserver.observe(canvas)}else window.addEventListener('resize',sizeCanvas);
+function project(p,scale=1){const c=Math.cos(state.yaw),s=Math.sin(state.yaw),cp=Math.cos(state.pitch),sp=Math.sin(state.pitch);const x=p[0],y=p[1],z=p[2]||0;const xr=x*c-y*s,yr=x*s+y*c;const perspective=1+((yr*sp+z*cp)/950);return {x:W*.5+xr*scale*state.zoom*perspective,y:H*.51+(yr*cp-z*sp)*scale*state.zoom*perspective,depth:yr*sp+z*cp};}
+function pathProjected(points,z=0){ctx.beginPath();points.forEach((p,i)=>{const q=project([p[0],p[1],p[2]===undefined?z:p[2]],.88);if(i===0)ctx.moveTo(q.x,q.y);else ctx.lineTo(q.x,q.y)});ctx.closePath();}
+function poly(points,fill,stroke='#d6b56f',lw=1.2,z=0){pathProjected(points,z);ctx.fillStyle=fill;ctx.fill();ctx.lineWidth=lw;ctx.strokeStyle=stroke;ctx.stroke();}
+function line3(a,b,color='rgba(113,190,255,.15)',width=1){const A=project(a,.88),B=project(b,.88);ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(B.x,B.y);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke();}
+function regular(n,r,rot=-Math.PI/2,cx=0,cy=0,z=0){return Array.from({length:n},(_,i)=>[cx+Math.cos(rot+i*TAU/n)*r,cy+Math.sin(rot+i*TAU/n)*r,z]);}
+function extrude(points,z=0,h=10,top='#e7c77d',side='#90703e',edge='#f6d997'){const n=points.length;const sides=[];for(let i=0;i<n;i++){const a=points[i],b=points[(i+1)%n];sides.push({i,depth:(a[1]+b[1])/2});}sides.sort((a,b)=>b.depth-a.depth);for(const s of sides){const i=s.i,a=points[i],b=points[(i+1)%n];poly([[a[0],a[1],z],[b[0],b[1],z],[b[0],b[1],z-h],[a[0],a[1],z-h]],side,'rgba(255,224,162,.3)',.7)}poly(points.map(p=>[p[0],p[1],z]),top,edge,1.2);}
+function board(){const w=350,h=238,z=-18;const base=[[-w,-h,z],[w,-h,z],[w,h,z],[-w,h,z]];extrude(base,z,18,'#eef3ee','#aabdb4','#ffffff');for(let x=-300;x<=300;x+=40)line3([x,-210,-17],[x,210,-17],'rgba(94,145,133,.16)',.7);for(let y=-200;y<=200;y+=40)line3([-320,y,-17],[320,y,-17],'rgba(94,145,133,.16)',.7);const corners=[[-w,-h,1],[w,-h,1],[w,h,1],[-w,h,1]].map(p=>project(p,.88));ctx.beginPath();corners.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();ctx.strokeStyle='rgba(85,160,151,.72)';ctx.lineWidth=2;ctx.shadowColor='#48cfff';ctx.shadowBlur=12;ctx.stroke();ctx.shadowBlur=0;}
+function rhombusAt(cx,cy,side,angle=72,rot=0,z=0){const a=angle*Math.PI/180;const v1=[Math.cos(rot)*side,Math.sin(rot)*side],v2=[Math.cos(rot+a)*side,Math.sin(rot+a)*side];return [[cx,cy,z],[cx+v1[0],cy+v1[1],z],[cx+v1[0]+v2[0],cy+v1[1]+v2[1],z],[cx+v2[0],cy+v2[1],z]];}
+function pentRhombusPattern(){
+  // A repeated educational motif built from regular pentagons and equal-edge rhombi.
+  const cols=5,rows=3,dx=124,dy=118;const entries=[];
+  for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){const cx=(i-(cols-1)/2)*dx+(j%2?dx/2:0),cy=(j-(rows-1)/2)*dy;const z=3+((i+j)%2)*1;
+    const pent=regular(5,31,-Math.PI/2,cx,cy,z);entries.push({type:'p',points:pent,depth:cy+13});
+    // Five matching-side rhombi are distributed around the pentagon as a visible compound tile unit.
+    for(let k=0;k<5;k++){const a=-Math.PI/2+k*TAU/5,mid=a+Math.PI/5;const rcx=cx+Math.cos(mid)*54,rcy=cy+Math.sin(mid)*54;const rot=mid-Math.PI*.5;const rh=rhombusAt(rcx,rcy,29,72,rot,z-1);entries.push({type:'r',points:rh,depth:rcy+14});}
+  }
+  entries.sort((a,b)=>a.depth-b.depth);
+  entries.forEach((e,idx)=>{if(e.type==='p'){const color=state.extra>0&&idx%3===0?'#ef9bb0':'#d6a65e';extrude(e.points,3,9,color,'#8a5e43','#f9d28c')}else{const hue=(idx%3===0)?'#d4e6ec':'#bd8d56';extrude(e.points,1,6,hue,'#77573e','#f1d093')}});
+  // Fine vertex markers emphasize the angle-matching idea.
+  for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){const cx=(i-(cols-1)/2)*dx+(j%2?dx/2:0),cy=(j-(rows-1)/2)*dy;const p=project([cx,cy,13],.88);ctx.beginPath();ctx.arc(p.x,p.y,2,0,TAU);ctx.fillStyle='rgba(116,242,255,.8)';ctx.fill();}
+  for(let k=0;k<state.extra;k++){const cx=-270+(k%5)*120,cy=-180+Math.floor(k/5)*110;const p=state.shape==='pentagon'?regular(5,30,-Math.PI/2,cx,cy,18):rhombusAt(cx,cy,29,72,-.4,18);extrude(p,18,11,state.shape==='pentagon'?'#f0a3b7':'#b8d7e1','#866448','#fff0be')}
+}
+const referenceTexture=new Image();referenceTexture.src='assets/pentagon-rhombus-reference.png';
+referenceTexture.addEventListener('load',()=>draw());
+function roundPattern(){
+ const R=224;const rim=Array.from({length:72},(_,i)=>[Math.cos(i*TAU/72)*R,Math.sin(i*TAU/72)*R,0]);
+ extrude(rim,0,20,'#d7e5de','#7f9d92','#fff7e6');
+ const center=project([0,0,3],.88),turn=state.yaw+(state.auto?state.anim*.22:0),c=Math.cos(turn),s=Math.sin(turn),cp=Math.cos(state.pitch),sc=state.zoom*.88;
+ ctx.save();ctx.translate(center.x,center.y);ctx.transform(c*sc,s*cp*sc,-s*sc,c*cp*sc,0,0);
+ ctx.beginPath();ctx.arc(0,0,R-5,0,TAU);ctx.clip();
+ if(referenceTexture.complete&&referenceTexture.naturalWidth){ctx.drawImage(referenceTexture,110,35,1140,1140,-R+5,-R+5,(R-5)*2,(R-5)*2)}else{
+  ctx.fillStyle='#e9d7aa';ctx.fillRect(-R,-R,R*2,R*2);ctx.strokeStyle='#c59b53';ctx.lineWidth=2;
+  for(let x=-R;x<=R;x+=25){ctx.beginPath();ctx.moveTo(x,-R);ctx.lineTo(x,R);ctx.stroke()}for(let y=-R;y<=R;y+=25){ctx.beginPath();ctx.moveTo(-R,y);ctx.lineTo(R,y);ctx.stroke()}
+ }
+ ctx.beginPath();ctx.arc(0,0,R-5,0,TAU);ctx.strokeStyle='rgba(255,255,255,.96)';ctx.lineWidth=4;ctx.stroke();ctx.restore();
+ // A few raised sample pieces on the near edge make the individual tile solids tangible.
+ for(let k=0;k<state.extra;k++){const x=-150+(k%5)*72,y=116+Math.floor(k/5)*40;const isPent=(state.shape!=='rhombus');const pts=isPent?regular(5,22,-Math.PI/2,x,y,18):rhombusAt(x,y,22,72,-.42,18);extrude(pts,18,12,isPent?'#e58e9e':'#b5dbe6','#805346','#ffe2a8')}
+}
+function squarePattern(){const cols=6,rows=4,cell=91,rect=state.alt;for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){const cw=rect?112:cell,ch=rect?70:cell;const pulse=state.auto?(.92+.08*(.5+.5*Math.sin(state.anim*2))):1;const x=(i-(cols-1)/2)*cw*pulse,y=(j-(rows-1)/2)*ch*pulse;const z=3;
+ const sq=[[x-cw/2,y-ch/2,z],[x+cw/2,y-ch/2,z],[x+cw/2,y+ch/2,z],[x-cw/2,y+ch/2,z]];
+ extrude(sq,z,7,((i+j)%2?'#a8c9ca':'#8fb8c7'),'#688d91','#edf8f4');
+ // pentagon is a raised inlay; the square/rectangle outlines remain the true repeating boundary.
+ const r=Math.min(cw,ch)*.34;extrude(regular(5,r,-Math.PI/2,x,y,z+8),z+8,7,((i+j)%2?'#d8a969':'#e9c67f'),'#875f42','#ffe5ad');
+ if(state.extra>0&&((i+j)%2===0)){const rr=regular(5,r*.48,-Math.PI/2,x,y,z+17);extrude(rr,z+17,3,'#e98cae','#89465f','#ffd4df')}
+ }
+}
+const icoVerts=[];for(const a of [-1,1])for(const b of [-phi,phi])icoVerts.push([0,a,b]);for(const a of [-1,1])for(const b of [-phi,phi])icoVerts.push([a,b,0]);for(const a of [-1,1])for(const b of [-phi,phi])icoVerts.push([b,0,a]);
+function dist2(a,b){return a.reduce((s,v,i)=>s+(v-b[i])**2,0)}
+const icoEdge=Math.min(...icoVerts.flatMap((a,i)=>icoVerts.slice(i+1).map(b=>dist2(a,b))));
+const icoFaces=[];for(let i=0;i<12;i++)for(let j=i+1;j<12;j++)for(let k=j+1;k<12;k++){if(Math.abs(dist2(icoVerts[i],icoVerts[j])-icoEdge)<1e-6&&Math.abs(dist2(icoVerts[j],icoVerts[k])-icoEdge)<1e-6&&Math.abs(dist2(icoVerts[k],icoVerts[i])-icoEdge)<1e-6)icoFaces.push([i,j,k]);}
+function vScale(a,s){return a.map(x=>x*s)}function vSub(a,b){return a.map((x,i)=>x-b[i])}function vAdd(a,b){return a.map((x,i)=>x+b[i])}function dot(a,b){return a.reduce((s,x,i)=>s+x*b[i],0)}function cross(a,b){return [a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]]}function norm(a){const n=Math.hypot(...a)||1;return a.map(x=>x/n)}
+function orderedOnPlane(points,normal){const center=points.reduce((s,p)=>vAdd(s,p),[0,0,0]).map(x=>x/points.length);let u=norm(vSub(points[0],center));let v=norm(cross(normal,u));return points.slice().sort((a,b)=>{const aa=vSub(a,center),bb=vSub(b,center);return Math.atan2(dot(aa,v),dot(aa,u))-Math.atan2(dot(bb,v),dot(bb,u))})}
+function truncatedIco(){const directed={};for(let i=0;i<12;i++)for(let j=0;j<12;j++)if(i!==j&&Math.abs(dist2(icoVerts[i],icoVerts[j])-icoEdge)<1e-6)directed[i+'_'+j]=vAdd(vScale(icoVerts[i],2/3),vScale(icoVerts[j],1/3));const faces=[];
+ for(let i=0;i<12;i++){const pts=[];for(let j=0;j<12;j++)if(directed[i+'_'+j])pts.push(directed[i+'_'+j]);faces.push({type:'pentagon',pts:orderedOnPlane(pts,norm(icoVerts[i]))})}
+ for(const [a,b,c]of icoFaces){const pts=[directed[a+'_'+b],directed[b+'_'+a],directed[b+'_'+c],directed[c+'_'+b],directed[c+'_'+a],directed[a+'_'+c]];faces.push({type:'hexagon',pts:orderedOnPlane(pts,norm(vAdd(vAdd(icoVerts[a],icoVerts[b]),icoVerts[c])))})}
+ return faces;}
+const ballFaces=truncatedIco();
+function ballScene(){const rot=state.anim*.12;const radius=166*(state.explode?1.13:1);const faces=ballFaces.map(f=>{let pts=f.pts.map(p=>{let x=p[0],y=p[1],z=p[2];const c=Math.cos(rot),s=Math.sin(rot),c2=Math.cos(state.anim*.07),s2=Math.sin(state.anim*.07);const x1=x*c-z*s,z1=x*s+z*c;return [x1*c2-y*s2,y*c2+x1*s2,z1] .map(v=>v*radius/Math.sqrt(1+phi*phi))});const center=pts.reduce((s,p)=>vAdd(s,p),[0,0,0]).map(x=>x/pts.length);let out=center;if(state.explode){const n=norm(center);pts=pts.map(p=>vAdd(p,vScale(n,17)));}return {type:f.type,pts,depth:project(center,1).depth};});faces.sort((a,b)=>a.depth-b.depth);
+ for(const f of faces){const pp=f.pts.map(p=>project(p,.88));ctx.beginPath();pp.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();const isP=f.type==='pentagon';ctx.fillStyle=isP?'#171d2b':'#eee8d8';ctx.strokeStyle=isP?'#090d16':'#9da9b8';ctx.lineWidth=isP?2.1:1.5;ctx.fill();ctx.stroke();if(!isP){ctx.beginPath();pp.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();ctx.strokeStyle='rgba(255,255,255,.55)';ctx.lineWidth=.5;ctx.stroke();}}
+ // soft halo and floating count labels
+ const center=project([0,0,0],.88);const glow=ctx.createRadialGradient(center.x,center.y,80,center.x,center.y,250);glow.addColorStop(0,'rgba(82,195,255,.04)');glow.addColorStop(1,'rgba(82,195,255,0)');ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);
+}
+function drawBackground(){const g=ctx.createRadialGradient(W*.5,H*.5,20,W*.5,H*.5,Math.max(W,H)*.62);g.addColorStop(0,'rgba(113,166,157,.10)');g.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);for(let i=0;i<5;i++){ctx.beginPath();ctx.ellipse(W*.5,H*.53,100+i*65,38+i*30,-.03,0,TAU);ctx.strokeStyle=`rgba(91,164,238,${.05-i*.006})`;ctx.lineWidth=1;ctx.stroke();}}
+function draw(){if(!ctx)return;ctx.clearRect(0,0,W,H);drawBackground();if(state.mode===2){ballScene();}else if(state.mode===0){roundPattern();}else{board();squarePattern();}if(state.mode===2){const y=H-48;ctx.font='11px Microsoft YaHei';ctx.fillStyle='rgba(62,99,103,.82)';ctx.textAlign='center';ctx.fillText('截角二十面体 · 12 个正五边形 + 20 个正六边形',W/2,y)} }
+function animate(t){const dt=Math.min(.05,(t-(state.lastTime||t))/1000);state.lastTime=t;if(state.auto){state.anim+=dt*1.1;if(state.mode===2&&!state.drag){state.yaw+=dt*.12}}else if(state.mode===2){state.anim+=dt*.12}draw();requestAnimationFrame(animate)}
+requestAnimationFrame(animate);
+function toast(s){const el=$('toast');el.textContent=s;el.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.remove('show'),1900)}
+
+// ===== 自由创作工作台：学生可拖动、旋转并检查顶点角度 =====
+const studio={tiles:[],selected:null,nextId:1,snap:true,drag:null,angles:[]};
+const TILE_SIDE=64;
+const shapeDefs={
+ triangle:{name:'正三角形',short:'△',fill:'#4a8db8',pts:regularStudio(3,TILE_SIDE/Math.sqrt(3),-Math.PI/2)},
+ square:{name:'正方形',short:'□',fill:'#b68a4d',pts:regularStudio(4,TILE_SIDE/Math.SQRT2,-Math.PI/4)},
+ pentagon:{name:'正五边形',short:'五',fill:'#bd667a',pts:regularStudio(5,TILE_SIDE/(2*Math.sin(Math.PI/5)),-Math.PI/2)},
+ hexagon:{name:'正六边形',short:'六',fill:'#5d9e83',pts:regularStudio(6,TILE_SIDE,-Math.PI/2)},
+ rhombus:{name:'菱形',short:'◇',pts:[[-41.89,-30.43],[22.11,-30.43],[41.89,30.43],[-22.11,30.43]],fill:'#8a79ba'}
+};
+function regularStudio(n,r,rot){return Array.from({length:n},(_,i)=>[Math.cos(rot+i*Math.PI*2/n)*r,Math.sin(rot+i*Math.PI*2/n)*r]);}
+const creatorBoard=$('creatorBoard'),creatorTiles=$('creatorTiles');
+function svgPoint(evt){const pt=creatorBoard.createSVGPoint();pt.x=evt.clientX;pt.y=evt.clientY;return pt.matrixTransform(creatorBoard.getScreenCTM().inverse());}
+function addStudioTile(type,x,y){const d=shapeDefs[type];if(!d)return;const k=studio.tiles.length;const t={id:studio.nextId++,type,x:x??(290+(k%5)*42),y:y??(185+Math.floor(k/5)*43),rot:0};studio.tiles.push(t);studio.selected=t.id;renderStudioTiles();return t;}
+function renderStudioTiles(){creatorTiles.innerHTML='';for(const t of studio.tiles){const d=shapeDefs[t.type],g=document.createElementNS('http://www.w3.org/2000/svg','g');g.setAttribute('class','tile-shape'+(studio.selected===t.id?' selected':''));g.dataset.id=t.id;g.setAttribute('transform',`translate(${t.x} ${t.y}) rotate(${t.rot})`);g.setAttribute('tabindex','0');g.setAttribute('role','button');g.setAttribute('aria-label',d.name+'，可拖动');
+ const poly=document.createElementNS('http://www.w3.org/2000/svg','polygon');poly.setAttribute('points',d.pts.map(p=>p.join(',')).join(' '));poly.setAttribute('fill',d.fill);poly.setAttribute('fill-opacity','.88');
+ const title=document.createElementNS('http://www.w3.org/2000/svg','title');title.textContent=d.name;g.append(poly,title);
+ if(studio.selected===t.id){const ring=document.createElementNS('http://www.w3.org/2000/svg','circle');ring.setAttribute('r','61');ring.setAttribute('fill','none');ring.setAttribute('stroke','rgba(100,232,255,.68)');ring.setAttribute('stroke-width','1.5');ring.setAttribute('stroke-dasharray','4 5');ring.setAttribute('pointer-events','none');g.append(ring);}
+ g.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();studio.selected=t.id;const p=svgPoint(e);studio.drag={id:t.id,dx:p.x-t.x,dy:p.y-t.y};creatorBoard.setPointerCapture(e.pointerId);renderStudioTiles();});
+ g.addEventListener('click',e=>{e.stopPropagation();studio.selected=t.id;renderStudioTiles();});creatorTiles.append(g);
+ }
+ $('creatorEmptyHint').style.display=studio.tiles.length?'none':'block';$('tileCount').textContent=studio.tiles.length;
+ const sel=studio.tiles.find(t=>t.id===studio.selected);$('selectedTileInfo').textContent=sel?`已选中：${shapeDefs[sel.type].name} · 旋转 ${((sel.rot%360)+360)%360}°`:'尚未选中图形';
+}
+function studioWorldPoints(t){const a=t.rot*Math.PI/180,c=Math.cos(a),sn=Math.sin(a);return shapeDefs[t.type].pts.map(([x,y])=>[t.x+x*c-y*sn,t.y+x*sn+y*c]);}
+function vertexSnapPosition(t,x,y){let best=null,bestD=13;const candidate={...t,x,y};const a=studioWorldPoints(candidate);for(const other of studio.tiles){if(other.id===t.id)continue;const b=studioWorldPoints(other);for(let i=0;i<a.length;i++)for(let j=0;j<b.length;j++){const dx=b[j][0]-a[i][0],dy=b[j][1]-a[i][1],d=Math.hypot(dx,dy);if(d<bestD){bestD=d;best={x:x+dx,y:y+dy};}}}return best?{...best,found:true}:{x,y,found:false};}
+creatorBoard.addEventListener('pointermove',e=>{if(!studio.drag)return;const p=svgPoint(e),t=studio.tiles.find(x=>x.id===studio.drag.id);if(!t)return;const rawX=p.x-studio.drag.dx,rawY=p.y-studio.drag.dy;const snapped=vertexSnapPosition(t,rawX,rawY);let x,y;if(snapped.found){x=snapped.x;y=snapped.y;}else if(studio.snap){x=Math.round(rawX/10)*10;y=Math.round(rawY/10)*10;}else{x=rawX;y=rawY;}t.x=Math.max(65,Math.min(695,x));t.y=Math.max(65,Math.min(455,y));const g=creatorTiles.querySelector(`[data-id="${t.id}"]`);if(g)g.setAttribute('transform',`translate(${t.x} ${t.y}) rotate(${t.rot})`);$('selectedTileInfo').textContent=`已选中：${shapeDefs[t.type].name} · 位置 (${Math.round(t.x)}, ${Math.round(t.y)})`;});
+function endStudioDrag(){studio.drag=null;renderStudioTiles();}
+creatorBoard.addEventListener('pointerup',endStudioDrag);creatorBoard.addEventListener('pointercancel',endStudioDrag);
+creatorBoard.addEventListener('pointerdown',e=>{if(e.target===creatorBoard||e.target.tagName==='rect'){studio.selected=null;renderStudioTiles();}});
+document.querySelectorAll('[data-add-shape]').forEach(b=>b.addEventListener('click',()=>{const t=addStudioTile(b.dataset.addShape);$('selectedTileInfo').textContent=`已添加：${shapeDefs[t.type].name}，可在画布上拖动`; }));
+$('rotateTile').onclick=()=>{const t=studio.tiles.find(x=>x.id===studio.selected);if(!t){toast('请先选中一个图形');return;}t.rot=(t.rot+15)%360;renderStudioTiles();};
+$('duplicateTile').onclick=()=>{const t=studio.tiles.find(x=>x.id===studio.selected);if(!t){toast('请先选中一个图形');return;}const c=addStudioTile(t.type,Math.min(680,t.x+35),Math.min(440,t.y+35));c.rot=t.rot;renderStudioTiles();};
+$('deleteTile').onclick=()=>{if(studio.selected===null){toast('请先选中一个图形');return;}studio.tiles=studio.tiles.filter(t=>t.id!==studio.selected);studio.selected=null;renderStudioTiles();};
+$('clearTiles').onclick=()=>{studio.tiles=[];studio.selected=null;renderStudioTiles();toast('画布已清空');};
+$('studioSnap').onclick=()=>{studio.snap=!studio.snap;$('studioSnap').textContent=studio.snap?'⌗ 网格吸附：开':'⌗ 网格吸附：关';$('snapInfo').textContent=studio.snap?'网格吸附已开启':'网格吸附已关闭';};
+$('studioResetView').onclick=()=>{studio.tiles.forEach((t,i)=>{t.x=280+(i%5)*48;t.y=170+Math.floor(i/5)*58;t.rot=0;});renderStudioTiles();};
+function updateAngleUI(){const wrap=$('angleChips');wrap.innerHTML='';let total=studio.angles.reduce((a,b)=>a+b.value,0);studio.angles.forEach((a,i)=>{const chip=document.createElement('span');chip.className='angle-chip';chip.innerHTML=`${a.name} ${a.value}° <button type="button" aria-label="移除角度">×</button>`;chip.querySelector('button').onclick=()=>{studio.angles.splice(i,1);updateAngleUI();};wrap.append(chip);});if(!studio.angles.length)wrap.innerHTML='<span class="studio-subtitle">还没有添加角，选择上方图形开始检验。</span>';
+ $('angleTotal').textContent=total+'°';const out=$('angleStatus');out.className='angle-status';if(!studio.angles.length){out.textContent='添加角度后，这里会显示是否存在空隙或重叠。';return;}
+ if(total===360){out.classList.add('good');out.textContent='✓ 角度和正好是 360°：这个顶点在角度上可以严密补满。接下来仍需检查边长、边缘对应和重复铺展。';}
+ else if(total<360){out.classList.add('warn');out.textContent=`还差 ${360-total}°：如果这些角在同一平面顶点相遇，会留下空隙。可以尝试再加入一个角。`;}
+ else{out.classList.add('bad');out.textContent=`超过 360° 共 ${total-360}°：这些角不能同时占据同一个平面顶点，会发生重叠。`;}
+}
+$('addAngle').onclick=()=>{const [v,n]=$('anglePicker').value.split('|');studio.angles.push({value:Number(v),name:n});updateAngleUI();};
+document.querySelectorAll('[data-angle-preset]').forEach(b=>b.addEventListener('click',()=>{const p=b.dataset.anglePreset;const map={triangle:[[60,'正三角形'],[60,'正三角形'],[60,'正三角形'],[60,'正三角形'],[60,'正三角形'],[60,'正三角形']],square:[[90,'正方形'],[90,'正方形'],[90,'正方形'],[90,'正方形']],hexagon:[[120,'正六边形'],[120,'正六边形'],[120,'正六边形']],mix:[[108,'正五边形'],[108,'正五边形'],[72,'菱形锐角'],[72,'菱形锐角']]};studio.angles=map[p].map(a=>({value:a[0],name:a[1]}));updateAngleUI();}));
+
+// ===== 几何验证引擎：检查实际摆放位置，而不只检查预设角度 =====
+let lastGeometryReport=null;
+function dist2d(a,b){return Math.hypot(a[0]-b[0],a[1]-b[1]);}
+function polygonSat(A,B){let minOverlap=Infinity;for(const P of [A,B]){for(let i=0;i<P.length;i++){const p=P[i],q=P[(i+1)%P.length],ex=q[0]-p[0],ey=q[1]-p[1],len=Math.hypot(ex,ey)||1,ax=-ey/len,ay=ex/len;let amin=Infinity,amax=-Infinity,bmin=Infinity,bmax=-Infinity;for(const v of A){const z=v[0]*ax+v[1]*ay;amin=Math.min(amin,z);amax=Math.max(amax,z);}for(const v of B){const z=v[0]*ax+v[1]*ay;bmin=Math.min(bmin,z);bmax=Math.max(bmax,z);}const overlap=Math.min(amax,bmax)-Math.max(amin,bmin);if(overlap<-0.8)return {overlap:false,depth:0};minOverlap=Math.min(minOverlap,overlap);}}return {overlap:minOverlap>1.5,depth:Math.max(0,minOverlap)};}
+function convexHull(points){const a=points.map(p=>[...p]).sort((p,q)=>p[0]-q[0]||p[1]-q[1]);if(a.length<3)return a;const cross2=(o,x,y)=>(x[0]-o[0])*(y[1]-o[1])-(x[1]-o[1])*(y[0]-o[0]);const lo=[],hi=[];for(const p of a){while(lo.length>=2&&cross2(lo[lo.length-2],lo[lo.length-1],p)<=0)lo.pop();lo.push(p);}for(let i=a.length-1;i>=0;i--){const p=a[i];while(hi.length>=2&&cross2(hi[hi.length-2],hi[hi.length-1],p)<=0)hi.pop();hi.push(p);}lo.pop();hi.pop();return lo.concat(hi);}
+function pointSegmentDistance(p,a,b){const dx=b[0]-a[0],dy=b[1]-a[1],d=dx*dx+dy*dy||1,t=Math.max(0,Math.min(1,((p[0]-a[0])*dx+(p[1]-a[1])*dy)/d));return Math.hypot(p[0]-a[0]-t*dx,p[1]-a[1]-t*dy);}
+function hullMargin(point,hull){if(hull.length<3)return 0;let sign=0;for(let i=0;i<hull.length;i++){const a=hull[i],b=hull[(i+1)%hull.length],z=(b[0]-a[0])*(point[1]-a[1])-(b[1]-a[1])*(point[0]-a[0]);if(Math.abs(z)>1e-4){const q=Math.sign(z);if(sign&&q!==sign)return 0;sign=q;}}let d=Infinity;for(let i=0;i<hull.length;i++)d=Math.min(d,pointSegmentDistance(point,hull[i],hull[(i+1)%hull.length]));return d;}
+function vertexInteriorAngle(points,i){const p=points[i],a=points[(i+points.length-1)%points.length],b=points[(i+1)%points.length];const u=[a[0]-p[0],a[1]-p[1]],v=[b[0]-p[0],b[1]-p[1]],den=(Math.hypot(...u)*Math.hypot(...v))||1;return Math.acos(Math.max(-1,Math.min(1,(u[0]*v[0]+u[1]*v[1])/den)))*180/Math.PI;}
+function analyzeStudioGeometry(){
+ const tiles=studio.tiles.map(t=>({tile:t,pts:studioWorldPoints(t)}));
+ const overlaps=[],edgePairs=[];let partialContacts=0;
+ for(let i=0;i<tiles.length;i++)for(let j=i+1;j<tiles.length;j++){
+  const hit=polygonSat(tiles[i].pts,tiles[j].pts);if(hit.overlap)overlaps.push([tiles[i].tile.id,tiles[j].tile.id,hit.depth]);
+  const A=tiles[i].pts,B=tiles[j].pts;
+  for(let a=0;a<A.length;a++)for(let b=0;b<B.length;b++){
+   const a1=A[a],a2=A[(a+1)%A.length],b1=B[b],b2=B[(b+1)%B.length];
+   if((dist2d(a1,b2)<4&&dist2d(a2,b1)<4)||(dist2d(a1,b1)<4&&dist2d(a2,b2)<4)){edgePairs.push({i,j,a,b});}
+   else{
+    const ux=a2[0]-a1[0],uy=a2[1]-a1[1],la=Math.hypot(ux,uy);if(la<1)continue;
+    const d1=Math.abs(ux*(b1[1]-a1[1])-uy*(b1[0]-a1[0]))/la,d2=Math.abs(ux*(b2[1]-a1[1])-uy*(b2[0]-a1[0]))/la;
+    const lb=Math.hypot(b2[0]-b1[0],b2[1]-b1[1]);if(d1<3&&d2<3&&lb>1){const vx=ux/la,vy=uy/la,t1=(b1[0]-a1[0])*vx+(b1[1]-a1[1])*vy,t2=(b2[0]-a1[0])*vx+(b2[1]-a1[1])*vy,over=Math.min(la,Math.max(t1,t2))-Math.max(0,Math.min(t1,t2));if(over>12)partialContacts++;}
+   }
+  }
+ }
+ const allVertices=[];tiles.forEach((obj,ti)=>obj.pts.forEach((p,vi)=>allVertices.push({p,ti,vi})));
+ const clusters=[];for(const v of allVertices){let c=clusters.find(x=>dist2d(x.center,v.p)<4.5);if(!c){c={center:[...v.p],items:[]};clusters.push(c);}c.items.push(v);c.center=c.items.reduce((a,x)=>[a[0]+x.p[0]/c.items.length,a[1]+x.p[1]/c.items.length],[0,0]);}
+ const hull=convexHull(allVertices.map(v=>v.p));const internalVertices=[];
+ for(const c of clusters){const unique=new Map();c.items.forEach(v=>unique.set(tiles[v.ti].tile.id,v));if(unique.size<2)continue;const margin=hullMargin(c.center,hull);if(margin<13)continue;const angles=[...unique.values()].map(v=>({name:shapeDefs[tiles[v.ti].tile.type].name,value:vertexInteriorAngle(tiles[v.ti].pts,v.vi),tileId:tiles[v.ti].tile.id}));const sum=angles.reduce((a,b)=>a+b.value,0);internalVertices.push({point:c.center,sum,angles,kind:sum<359.2?'gap':sum>360.8?'over':'closed'});}
+ const matchedEdges=edgePairs.length,edgeTotal=tiles.reduce((n,t)=>n+t.pts.length,0);
+ return {count:tiles.length,overlaps,matchedEdges,partialContacts,edgeTotal,exposedEdges:Math.max(0,edgeTotal-2*matchedEdges),internalVertices,openVertices:internalVertices.filter(v=>v.kind==='gap'),overVertices:internalVertices.filter(v=>v.kind==='over'),closedVertices:internalVertices.filter(v=>v.kind==='closed')};
+}
+function paintGeometryMarks(report){$('geometryMarks').innerHTML='';creatorTiles.querySelectorAll('.tile-shape').forEach(g=>g.classList.remove('overlap'));const ns='http://www.w3.org/2000/svg';report.overlaps.forEach(pair=>pair.slice(0,2).forEach(id=>{const g=creatorTiles.querySelector(`[data-id="${id}"]`);if(g)g.classList.add('overlap');}));for(const v of [...report.openVertices,...report.overVertices]){const c=document.createElementNS(ns,'circle');c.setAttribute('cx',v.point[0]);c.setAttribute('cy',v.point[1]);c.setAttribute('r','7');c.setAttribute('class',v.kind==='gap'?'geometry-mark-gap':'geometry-mark-over');$('geometryMarks').append(c);const tx=document.createElementNS(ns,'text');tx.setAttribute('x',v.point[0]);tx.setAttribute('y',v.point[1]-11);tx.setAttribute('class','geometry-mark-text');tx.textContent=Math.round(v.sum)+'°';$('geometryMarks').append(tx);}}
+function runStudioGeometryCheck(){
+ const r=analyzeStudioGeometry();lastGeometryReport=r;paintGeometryMarks(r);const box=$('geometryReport');box.classList.add('show');let pill='初步分析',summary='',detail='';
+ if(r.count===0){pill='尚无图形';summary='先从左侧添加至少两个图形，再运行检测。';}
+ else if(r.count===1){pill='材料已就绪';summary='当前只有 1 个图形，还没有形成组合。请再添加图形，观察边与顶点怎样衔接。';}
+ else{
+  if(r.overlaps.length){pill='发现重叠';summary=`<strong>发现 ${r.overlaps.length} 组图形存在面积重叠。</strong> 画布上红色边框标出了相关图形。请拖开红色图形，再次检测。`;}
+  else if(r.openVertices.length){pill='发现角度空缺';const v=r.openVertices[0];summary=`<strong>发现 ${r.openVertices.length} 处内部顶点没有补满 360°。</strong> 例如一处角度和为 ${v.sum.toFixed(1)}°，还差 ${(360-v.sum).toFixed(1)}°，可能留下空隙。黄色标记显示了位置。`;}
+  else if(r.overVertices.length){pill='顶点角度超量';const v=r.overVertices[0];summary=`<strong>发现 ${r.overVertices.length} 处内部顶点角度和超过 360°。</strong> 例如一处达到 ${v.sum.toFixed(1)}°，可能产生重叠。红色标记显示了位置。`;}
+  else if(r.closedVertices.length){pill='局部结构良好';summary=`<strong>未发现明显面积重叠，检测到 ${r.closedVertices.length} 个内部顶点的角度和为 360°。</strong> 这说明这些局部连接符合顶点角度条件。`;}
+  else{pill='继续补充图形';summary='暂未识别到位于内部区域的公共顶点。可以继续添加并对齐图形，组成更完整的拼接区域。';}
+  detail=`检测 ${r.count} 个图形 · ${r.matchedEdges} 对完整公共边 · ${r.partialContacts} 处部分边接触 · ${r.exposedEdges} 条未配对边（可能是外轮廓）。`;
+  if(!r.overlaps.length&&!r.openVertices.length&&!r.overVertices.length)detail+=' 当前只验证已摆放区域；外边界仍开放，不能据此证明可无限延伸密铺。';
+ }
+ box.innerHTML=`<div class="geometry-head">✧ 拓拓几何检测报告 <span class="geometry-pill">${pill}</span></div><div class="geometry-summary">${summary}</div><div class="geometry-detail">${detail}</div>`;
+ return {report:r,text:(summary.replace(/<[^>]*>/g,'')+(detail?' '+detail:''))};
+}
+$('runTilingCheck').onclick=()=>{const result=runStudioGeometryCheck();toast('几何检测完成');};
+function loadStudioSample(kind){
+ studio.tiles=[];studio.selected=null;studio.angles=[];
+ const layouts={good:[['square',290,185],['square',354,185],['square',290,249],['square',354,249]],gap:[['square',290,185],['square',354,185],['square',290,249]],overlap:[['square',290,185],['square',330,185]]};
+ (layouts[kind]||layouts.good).forEach(([type,x,y])=>{const t=addStudioTile(type,x,y);t.rot=0;});
+ studio.selected=null;renderStudioTiles();updateAngleUI();runStudioGeometryCheck();
+}
+$('sampleGood').onclick=()=>loadStudioSample('good');
+$('sampleGap').onclick=()=>loadStudioSample('gap');
+$('sampleOverlap').onclick=()=>loadStudioSample('overlap');
+
+
+$('studioModal').addEventListener('click',e=>{if(e.target===$('studioModal'))$('studioModal').classList.remove('open');});
+$('studioClose').onclick=()=>$('studioModal').classList.remove('open');
+$('studioBtn').onclick=()=>{$('studioModal').classList.add('open');renderStudioTiles();updateAngleUI();};
+$('exportDesign').onclick=()=>{const clone=creatorBoard.cloneNode(true);clone.setAttribute('xmlns','http://www.w3.org/2000/svg');clone.setAttribute('width','1520');clone.setAttribute('height','1040');const xml=new XMLSerializer().serializeToString(clone);const blob=new Blob([xml],{type:'image/svg+xml;charset=utf-8'});const url=URL.createObjectURL(blob);const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=1520;c.height=1040;const x=c.getContext('2d');x.fillStyle='#0b142b';x.fillRect(0,0,c.width,c.height);x.drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(url);c.toBlob(b=>{const u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='我的密铺设计.png';a.click();URL.revokeObjectURL(u);},'image/png');};img.onerror=()=>{URL.revokeObjectURL(url);toast('导出失败，请重试');};img.src=url;};
+$('saveDesign').onclick=()=>{const data={title:'我的密铺设计',version:3,tileSide:TILE_SIDE,geometryCheck:lastGeometryReport,tiles:studio.tiles.map(t=>({...t})),angleCheck:studio.angles.map(a=>({...a})),createdAt:new Date().toISOString()};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='我的密铺设计.json';a.click();URL.revokeObjectURL(url);};
+function openStudio(){ $('studioModal').classList.add('open');renderStudioTiles();updateAngleUI(); }
+function studioAngleReport(){const total=studio.angles.reduce((a,b)=>a+b.value,0);if(!studio.angles.length)return '你还没有在“顶点角度检验”中添加角度。请先选择准备在同一个顶点相遇的图形内角，再检查总和。';if(total===360)return `你当前加入了 ${studio.angles.length} 个角，角度总和正好是 360°。这说明该顶点在角度上可以补满，但还不能单凭角度判断整幅图案一定密铺，还要检查边长与重复铺展。`;if(total<360)return `你当前加入的角度总和是 ${total}°，还差 ${360-total}°，在同一顶点会留下空隙。`;return `你当前加入的角度总和是 ${total}°，超过 360° 共 ${total-360}°，会发生重叠。`;}
+
+function setMode(m){state.mode=m;state.extra=0;state.alt=false;state.auto=false;state.explode=false;state.anim=0;state.yaw=-.42;state.pitch=.55;state.zoom=1;document.querySelectorAll('.mode-card').forEach(b=>b.classList.toggle('selected',Number(b.dataset.mode)===m));if(m===0){$('sceneKicker').textContent='EXPERIMENT 01 / PLANE TILING';$('sceneTitle').textContent='五边形 × 菱形 · 平面复合密铺';$('sceneDesc').textContent='观察两种图形如何协作，让顶点周围严丝合缝地补满 360°。';$('metricA').textContent='108°';$('metricALabel').textContent='正五边形内角';$('metricB').textContent='72°';$('metricBLabel').textContent='菱形锐角';$('metricC').textContent='360°';$('hudRight').innerHTML='图形结构 · 边线相接<br><span style="color:#718b84">空间视角 · 可旋转观察</span>';$('hudBottom').textContent='从边线到顶点，观察图形怎样连续铺展';$('actionMain').textContent='▶ 自动铺展';$('actionAdd').textContent='＋ 添加图块';$('actionAlt').textContent='◇ 切换添加形状';$('toolHint').textContent='拖动中央模型，观察不同方向的拼接关系'}else if(m===1){$('sceneKicker').textContent='EXPERIMENT 02 / INLAY PATTERN';$('sceneTitle').textContent='正五边形嵌入式 · 方形 / 长方形单元';$('sceneDesc').textContent='先让方形或长方形单元铺满平面，再把正五边形嵌入每个单元。';$('metricA').textContent='90°';$('metricALabel').textContent='正方形内角';$('metricB').textContent='4';$('metricBLabel').textContent='每点相接方格';$('metricC').textContent='360°';$('hudRight').innerHTML='TILE SYSTEM / SQUARE + PENTAGON INLAY<br><span style="color:#6f8ab7">BASE GRID: 2D PLANE</span>';$('hudBottom').textContent='方形 / 长方形是铺底单元 · 五边形是嵌入图案';$('actionMain').textContent='▶ 铺满单元';$('actionAdd').textContent='＋ 添加嵌入五边形';$('actionAlt').textContent='▤ 方形 / 长方形';$('toolHint').textContent='切换方格形状，比较底层边界'}else{$('sceneKicker').textContent='EXPERIMENT 03 / SPHERICAL STRUCTURE';$('sceneTitle').textContent='足球 · 五边形与六边形的球面结构';$('sceneDesc').textContent='旋转观察足球表面：平面密铺走向曲面拼接，结构也随之改变。';$('metricA').textContent='12';$('metricALabel').textContent='正五边形';$('metricB').textContent='20';$('metricBLabel').textContent='正六边形';$('metricC').textContent='32';$('metricCLabel').textContent='总面数';$('hudRight').innerHTML='SOLID / TRUNCATED ICOSAHEDRON<br><span style="color:#6f8ab7">SPHERICAL SURFACE</span>';$('hudBottom').textContent='拖动旋转球体 · 拆解观察五边形与六边形';$('actionMain').textContent='▶ 自动旋转';$('actionAdd').textContent='✧ 拆解球面';$('actionAlt').textContent='◇ 收拢球体';$('toolHint').textContent='球面拼接，不等同于平面密铺'}draw();}
+document.querySelectorAll('.mode-card').forEach(b=>b.addEventListener('click',()=>{setMode(Number(b.dataset.mode));toast('已进入创作空间 '+(Number(b.dataset.mode)+1));}));
+$('actionMain').addEventListener('click',()=>{if(state.mode===2){state.auto=!state.auto;$('actionMain').textContent=state.auto?'Ⅱ 暂停旋转':'▶ 自动旋转';toast(state.auto?'球体开始旋转':'已暂停旋转');}else{state.auto=!state.auto;$('actionMain').textContent=state.auto?'Ⅱ 暂停铺展':'▶ 自动铺展';toast(state.auto?'正在展示重复铺展':'已暂停动画');}});
+$('actionAdd').addEventListener('click',()=>{if(state.mode===0){state.extra++;state.shape=state.alt?'rhombus':'pentagon';toast(state.shape==='pentagon'?'已添加正五边形':'已添加菱形');}else if(state.mode===1){state.extra++;toast('已增加嵌入的正五边形');}else{state.explode=!state.explode;toast(state.explode?'球面图块已分开展示':'球面结构已合拢');$('actionAdd').textContent=state.explode?'✧ 合拢球面':'✧ 拆解球面';}draw();});
+$('actionAlt').addEventListener('click',()=>{if(state.mode===0){state.alt=!state.alt;state.shape=state.alt?'rhombus':'pentagon';$('actionAdd').textContent=state.alt?'＋ 添加菱形':'＋ 添加正五边形';toast(state.alt?'当前添加：菱形':'当前添加：正五边形');}else if(state.mode===1){state.alt=!state.alt;toast(state.alt?'已切换为长方形单元':'已切换为正方形单元');}else{state.explode=false;state.auto=false;toast('足球球体已收拢');$('actionAdd').textContent='✧ 拆解球面';}draw();});
+$('zoomIn').onclick=()=>{state.zoom=Math.min(1.8,state.zoom*1.12);draw()};$('zoomOut').onclick=()=>{state.zoom=Math.max(.55,state.zoom/1.12);draw()};$('resetView').onclick=()=>{state.yaw=-.42;state.pitch=.55;state.zoom=1;state.auto=false;toast('视角已重置');draw()};
+canvas.addEventListener('pointerdown',e=>{state.drag=true;state.lastX=e.clientX;state.lastY=e.clientY;canvas.setPointerCapture(e.pointerId)});canvas.addEventListener('pointermove',e=>{if(!state.drag)return;const dx=e.clientX-state.lastX,dy=e.clientY-state.lastY;state.lastX=e.clientX;state.lastY=e.clientY;state.yaw+=dx*.008;state.pitch=Math.max(.22,Math.min(1.08,state.pitch+dy*.004));if(state.mode===2)state.anim+=dx*.006;draw()});canvas.addEventListener('pointerup',()=>state.drag=false);canvas.addEventListener('pointercancel',()=>state.drag=false);canvas.addEventListener('wheel',e=>{e.preventDefault();state.zoom=Math.max(.55,Math.min(1.8,state.zoom*(e.deltaY<0?1.08:.92)));draw()},{passive:false});
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$('studioModal').classList.remove('open');if($('studioModal').classList.contains('open')&&(e.key==='Delete'||e.key==='Backspace')&&studio.selected!==null){studio.tiles=studio.tiles.filter(t=>t.id!==studio.selected);studio.selected=null;renderStudioTiles();}});
+$('refsBtn').onclick=()=>$('refsModal').classList.add('open');$('helpBtn').onclick=()=>$('helpModal').classList.add('open');document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>b.closest('.modal').classList.remove('open')));document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
+function respond(q){const s=q.toLowerCase().replace(/[？?！，。、“”\s]/g,'');const mode=state.mode;
+ if(/自由创作|我要创作|自己搭建|自己拼|自己摆/.test(s)){openStudio();return '创作工作台已经打开！你可以从左侧选正三角形、正方形、正五边形、正六边形或菱形，拖动它们自由组合；也可以用“顶点角度检验”检查角度和是否正好为 360°。完成后还能导出作品图和设计数据。';}
+ if(/密铺检测|检测我的作品|有没有重叠|有没有空隙|分析作品/.test(s)){openStudio();const result=runStudioGeometryCheck();return '我已经对当前画布进行了几何检查。'+result.text+'你可以根据黄色空缺标记或红色重叠标记调整图形，再点一次“AI 密铺检测”。';}
+ if(/检查|检验|摆的|作品|角度和|顶点角/.test(s)){openStudio();if(studio.tiles.length>1){const result=runStudioGeometryCheck();return result.text+'我已打开自由创作工作台，你可以继续调整图形。';}return studioAngleReport()+'我已打开自由创作工作台。摆放至少两个图形后，可以运行“AI 密铺检测”。';}
+ if(/足球|皮球|球面|六边形|截角|二十面体/.test(s)){setMode(2);return '足球给我们的启发是：<strong>平面密铺和球面拼接不是一回事</strong>。经典足球形状可以看作“截角二十面体”，由 <strong>12 个正五边形和 20 个正六边形</strong>组成。<br><br>球面上每个顶点周围通常是 1 个五边形和 2 个六边形相遇。它们的角度和是 <span class="math">108° + 120° + 120° = 348°</span>少掉的 12° 形成曲面的角亏，所以它能围成球面，却不是平面上的无缝密铺。<br><br>我已经帮你切换到第三种创作空间，拖动球体看看吧！';}
+ if(/第二种|第二张图|第二张|图二|嵌入|长方形|方形|正方形|单元|到底是谁/.test(s)){setMode(1);return '第二种要特别分清“铺底”和“装饰”：<br><br><strong>真正负责铺满平面的是正方形或长方形单元。</strong>它们边对边排列，可以无缝铺满平面。正五边形放在每个单元内部，是嵌入的图案或装饰纹样。<br><br>所以，这种设计里虽然能看到很多正五边形，但不能说“正五边形本身完成了密铺”。我已经切换到第二种空间，你可以切换方形 / 长方形，观察边界是谁。';}
+ if(/第一种|第一张图|第一张|图一|菱形|组合|为什么能|五边形能|正五边形|能不能密铺|能单独/.test(s)){setMode(0);return '这个问题很关键！要分两种情况：<br><br><strong>① 正五边形单独密铺：不可以。</strong>正五边形每个内角是 108°。3 个角围在一起是 <span class="math">3 × 108° = 324°</span>，还差 36°；4 个角是 432°，会重叠。因此不能只用全等正五边形无缝铺满平面。<br><br><strong>② 正五边形和菱形组合密铺：可以。</strong>当菱形的边长与正五边形边长相等，并按合适的角度组合时，顶点处可以由两个 108° 的五边形角和两个 72° 的菱形锐角补成 <span class="math">108° + 72° + 108° + 72° = 360°</span>。<br><br>所以，第一种不是“五边形自己铺满”，而是<strong>五边形和菱形合作铺满</strong>。我已切换到第一种空间。';}
+ if(/角度|360|为什么|原理|顶点/.test(s)){return '判断平面图形能不能密铺，可以先看一个关键位置：<strong>拼在一起的图形，在同一个顶点周围的角度和必须正好是 360°</strong>，不能留缝，也不能重叠。<br><br>例如正五边形内角 108°，单独拼接时 3 个角只有 324°；而在五边形与菱形的组合方案中，可以用 108° 和 72° 的角按合适顺序补足 360°。<br><br>你可以问我：“如果把菱形换成别的角度，会发生什么？”';}
+ if(/古窗|窗花|纹样|设计|创作|怎么做/.test(s)){return '可以从古窗纹样找灵感！先观察图案的基本单元，再找平移、旋转或对称的重复规律。你可以选择下方三种空间之一：<strong>五边形＋菱形</strong>、<strong>五边形嵌入方形单元</strong>，或<strong>足球球面结构</strong>。<br><br>我建议先从第二种开始：先用方格排满，再尝试改变单元内部的五边形纹样。';}
+ if(/你好|嗨|哈喽|hello/.test(s)){return '你好呀！我是拓拓，今天陪你研究“图形怎样无缝拼在一起”。你最想挑战哪一个问题？五边形和菱形、方格里的五边形，还是足球的球面结构？';}
+ return '这个问题很有探索价值！我目前专注于本实验的三类内容：<strong>正五边形与菱形组合密铺、正五边形嵌入方形 / 长方形单元、足球的五边形—六边形球面结构</strong>。<br><br>你可以把问题说得更具体一些，例如：“五边形内角是多少度？”“第二种是谁在铺满平面？”“足球为什么不是平面密铺？”我会结合沙盘给你解释。';}
+function appendMsg(who,html){const box=document.createElement('div');box.className='msg '+(who==='user'?'user':'bot');const label=document.createElement('div');label.className='msg-label';label.textContent=who==='user'?'你 · 刚刚':'拓拓 · 刚刚';const bubble=document.createElement('div');bubble.className='bubble';bubble.innerHTML=html;box.append(label,bubble);$('chatLog').appendChild(box);$('chatLog').scrollTop=$('chatLog').scrollHeight;}
+$('chatForm').addEventListener('submit',e=>{e.preventDefault();const q=$('chatInput').value.trim();if(!q)return;appendMsg('user',escapeHtml(q));$('chatInput').value='';const answer=respond(q);setTimeout(()=>appendMsg('bot',answer),180);});document.querySelectorAll('.quick').forEach(b=>b.addEventListener('click',()=>{$('chatInput').value=b.textContent;$('chatForm').requestSubmit()}));
+function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+sizeCanvas();
+})();
+</script>
+
+<div class="room-overlay" id="roomModelModal" role="dialog" aria-modal="true" aria-label="立体密铺模型互动">
+  <div class="room-panel-card">
+    <div class="room-panel-head"><div><strong>中央立体模型 · 互动观察</strong><small>DRAG TO ROTATE · WHEEL TO ZOOM · EXPLORE THE TILE STRUCTURE</small></div><button class="room-close" data-room-close="roomModelModal">返回实验室</button></div>
+    <div class="room-model-content" id="roomModelMount"></div>
+  </div>
+</div>
+<div class="room-overlay" id="roomChoiceModal" role="dialog" aria-modal="true" aria-label="选择密铺主题">
+ <div class="room-choice-card">
+  <div class="room-panel-head" style="padding:0 0 15px;background:transparent;border:0"><div><div class="room-choice-title">选择你的密铺探索主题</div><p class="room-choice-sub">从平面组合、嵌入图案到球面结构，选择一个展台开始研究。</p></div><button class="room-close" data-room-close="roomChoiceModal">关闭</button></div>
+  <div class="room-choice-grid">
+   <button class="room-choice-option" data-room-choice="0"><div class="room-choice-art"><svg viewBox="0 0 300 155"><rect width="300" height="155" fill="#eef6f3"/><g stroke="#fff" stroke-width="3"><path fill="#e77859" d="M150 18 181 40 169 78 131 78 119 40Z"/><path fill="#e6c176" d="M119 40 150 18 131 78 76 78Z"/><path fill="#75b9c2" d="M181 40 224 78 169 78 150 18Z"/><path fill="#9bbeb0" d="M76 78 131 78 150 137 93 116Z"/><path fill="#e6c176" d="M169 78 224 78 207 116 150 137Z"/><path fill="#f5e8cb" d="M131 78 169 78 150 137Z"/></g></svg></div><div class="room-choice-copy"><b>01 五边形＋菱形</b><span>观察不同图形怎样组合，补足顶点周围的角度。</span><i class="room-choice-enter">进入平面组合密铺 →</i></div></button>
+   <button class="room-choice-option" data-room-choice="1"><div class="room-choice-art"><svg viewBox="0 0 300 155"><rect width="300" height="155" fill="#edf5f4"/><g stroke="#92b7b0" stroke-width="3"><rect x="52" y="8" width="94" height="68" rx="3" fill="#deeee9"/><rect x="154" y="8" width="94" height="68" rx="3" fill="#deeee9"/><rect x="52" y="80" width="94" height="68" rx="3" fill="#deeee9"/><rect x="154" y="80" width="94" height="68" rx="3" fill="#deeee9"/></g><g fill="#e2ad60" stroke="#b98148" stroke-width="2"><path d="M99 19 125 38 115 65 83 65 73 38Z"/><path d="M201 19 227 38 217 65 185 65 175 38Z"/><path d="M99 91 125 110 115 137 83 137 73 110Z"/><path d="M201 91 227 110 217 137 185 137 175 110Z"/></g></svg></div><div class="room-choice-copy"><b>02 正五边形嵌入</b><span>研究方形或长方形单元铺底，五边形嵌入其中的关系。</span><i class="room-choice-enter">进入嵌入式结构 →</i></div></button>
+   <button class="room-choice-option" data-room-choice="2"><div class="room-choice-art"><svg viewBox="0 0 300 155"><rect width="300" height="155" fill="#eef5f6"/><g transform="translate(150 78)" stroke="#fff" stroke-width="2"><path fill="#273b4c" d="M0-61 34-48 48-14 33 28 0 43-33 28-48-14-34-48Z"/><path fill="#f3f5ef" d="M0-61 17-51 15-27-15-27-17-51Z"/><path fill="#f3f5ef" d="M48-14 42 16 21 31 5 13 15-27Z"/><path fill="#f3f5ef" d="M-48-14-42 16-21 31-5 13-15-27Z"/><path fill="#f3f5ef" d="M-33 28-15 27 0 43 15 27 33 28 17 51-17 51Z"/><path fill="#f3f5ef" d="M-34-48-17-51-15-27-42-16-48-14Z"/><path fill="#f3f5ef" d="M34-48 17-51 15-27 42-16 48-14Z"/></g></svg></div><div class="room-choice-copy"><b>03 足球立体结构</b><span>观察正五边形与正六边形怎样组成球面多面体。</span><i class="room-choice-enter">进入球面结构 →</i></div></button>
+  </div>
+ </div>
+</div>
+<div class="room-overlay" id="roomChallengeModal" role="dialog" aria-modal="true" aria-label="密铺挑战">
+ <div class="room-choice-card">
+  <div class="room-panel-head" style="padding:0 0 15px;background:transparent;border:0"><div><div class="room-choice-title">密铺探索挑战</div><p class="room-choice-sub">先观察，再动手拼搭，最后解释你的数学发现。</p></div><button class="room-close" data-room-close="roomChallengeModal">关闭</button></div>
+  <div class="room-challenge-list">
+   <button class="room-challenge" data-challenge="0"><em>⬠</em><b>挑战一：五边形找伙伴</b><span>正五边形不能单独铺满平面，试着为它寻找合适的搭档。</span></button>
+   <button class="room-challenge" data-challenge="1"><em>▦</em><b>挑战二：辨认真正的铺底单元</b><span>观察方格中的正五边形，说明是谁让整体连续铺满。</span></button>
+   <button class="room-challenge" data-challenge="2"><em>⚽</em><b>挑战三：从平面走向球面</b><span>数一数足球表面的五边形和六边形，解释它与平面密铺的不同。</span></button>
+  </div>
+ </div>
+</div>
+
+<script>
+(()=>{
+  const $=id=>document.getElementById(id);
+  const room=document.getElementById('polylab-room');
+  const app=document.querySelector('.engine-sandbox .app');
+  const workspace=app?.querySelector('.workspace');
+  const agent=app?.querySelector('.agent');
+  // Move the existing live 3D canvas and its learning controls into a modal opened from the room's central hologram.
+  const mount=$('roomModelMount');
+  if(workspace&&mount){
+    ['.scene-head','.stage-wrap','#toolbar','.mode-row'].forEach(sel=>{
+      const node=workspace.querySelector(sel);
+      if(node)mount.appendChild(node);
+    });
+  }
+  if(agent&&$('roomChatSlot'))$('roomChatSlot').appendChild(agent);
+  function openOverlay(id){$(id)?.classList.add('open');}
+  function closeOverlay(id){$(id)?.classList.remove('open');}
+  function selectMode(n,show=true){
+    const btn=document.querySelector(`.engine-sandbox .mode-card[data-mode="${n}"]`);
+    if(btn)btn.click();
+    if(show){closeOverlay('roomChoiceModal');openOverlay('roomModelModal');requestAnimationFrame(()=>window.dispatchEvent(new Event('resize')));}
+  }
+  document.querySelectorAll('[data-room-mode]').forEach(b=>b.addEventListener('click',()=>selectMode(Number(b.dataset.roomMode))));
+  document.querySelectorAll('[data-room-choice]').forEach(b=>b.addEventListener('click',()=>selectMode(Number(b.dataset.roomChoice))));
+  $('openCentralModel')?.addEventListener('click',()=>{openOverlay('roomModelModal');requestAnimationFrame(()=>window.dispatchEvent(new Event('resize')));});
+  $('openRoomChoices')?.addEventListener('click',()=>openOverlay('roomChoiceModal'));
+  function openStudio(){closeOverlay('roomModelModal');$('studioBtn')?.click();}
+  $('openRoomStudio')?.addEventListener('click',openStudio);
+  $('openBenchStudio')?.addEventListener('click',openStudio);
+  $('openRoomGeometry')?.addEventListener('click',()=>{openStudio();setTimeout(()=>$('runTilingCheck')?.click(),100);});
+  $('openRoomChallenges')?.addEventListener('click',()=>openOverlay('roomChallengeModal'));
+  $('openTotoChat')?.addEventListener('click',()=>$('roomChatPanel')?.classList.add('open'));
+  $('closeRoomChat')?.addEventListener('click',()=>$('roomChatPanel')?.classList.remove('open'));
+  document.querySelectorAll('[data-room-close]').forEach(b=>b.addEventListener('click',()=>closeOverlay(b.dataset.roomClose)));
+  ['roomModelModal','roomChoiceModal','roomChallengeModal'].forEach(id=>$(id)?.addEventListener('click',e=>{if(e.target===$(id))closeOverlay(id);}));
+  document.querySelectorAll('[data-challenge]').forEach(b=>b.addEventListener('click',()=>{
+    const n=Number(b.dataset.challenge);
+    closeOverlay('roomChallengeModal');
+    if(n===0){selectMode(0);}
+    else if(n===1){selectMode(1);}
+    else{selectMode(2);}
+  }));
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){
+      ['roomModelModal','roomChoiceModal','roomChallengeModal'].forEach(closeOverlay);
+      $('roomChatPanel')?.classList.remove('open');
+      $('studioModal')?.classList.remove('open');
+    }
+  });
+  // Make the entire visual exhibit keyboard accessible and offer a short toast on focused hotspots.
+  document.querySelectorAll('.room-hit').forEach(b=>{
+    b.addEventListener('focus',()=>b.setAttribute('data-focused','true'));
+    b.addEventListener('blur',()=>b.removeAttribute('data-focused'));
+  });
+})();
+</script>
+</body>
