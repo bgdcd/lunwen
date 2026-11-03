@@ -72,8 +72,8 @@ Worker 已内置轻量关键词检索知识库，覆盖：
 window.TotoAI.updateGeometryState({
   dimension: "2d",
   objects: [
-    { id: "shape-1", shape: "正五边形", sides: 5, rotationDeg: 36, x: 120, y: 80 },
-    { id: "shape-2", shape: "正方形", sides: 4, rotationDeg: 0, x: 220, y: 80 }
+    { id: "shape-1", shape: "正五边形", sides: 5, vertexAnglesDeg: [108, 108, 108, 108, 108], rotationDeg: 36, x: 120, y: 80 },
+    { id: "shape-2", shape: "菱形", sides: 4, vertexAnglesDeg: [72, 108, 72, 108], rotationDeg: 0, x: 220, y: 80 }
   ]
 });
 ```
@@ -82,4 +82,4 @@ window.TotoAI.updateGeometryState({
 
 重要：真实的二维自由创作编辑器位于仓库根目录的 `index.html`，现已完成数据桥接，不再只是预留接口。添加图形、拖动图形（拖动过程中实时同步）、旋转、复制、删除、清空、恢复布局和加载示例后，都会自动更新 `window.TotoAI.getGeometryState()`，并广播 `toto:geometrychange` 与 `polylab:geometry-updated` 事件。当前 `index-workbench.html` 的 `benchCanvas` 仍是独立的装饰性 3D 展示画布，不会被误报为可编辑模型。
 
-注意两个页面目前仍是独立入口：`index.html` 中的本地拓拓可使用其内置几何检测引擎；`index-workbench.html` 中的云端 Worker 聊天读取其自身页面收到的几何状态。此提交已让真实编辑器持续输出标准化状态事件，但没有声称两个独立页面之间已经自动跨页传输，也没有声称豆包后端已部署。若要让云端 Worker 直接回答 `index.html` 当前作品的状态，需要下一步把该页面的聊天请求接到同一 Worker，或建立明确的同源消息桥接。
+几何角度数据特别说明：正三角形、正方形、正五边形、正六边形等规则多边形可由边数计算内角；菱形不是正方形，不能用“4 边形内角都是 90°”代替真实角度。真实编辑器现在会把每个顶点的角度逐一传入 `vertexAnglesDeg`（例如菱形为 72°、108°、72°、108°），Worker 会优先使用这些实测顶点角，不再把菱形错误计算成 90°。\n\n注意两个页面目前仍是独立入口：`index.html` 中的本地拓拓可使用其内置几何检测引擎；`index-workbench.html` 中的云端 Worker 聊天读取其自身页面收到的几何状态。此提交已让真实编辑器持续输出标准化状态事件，但没有声称两个独立页面之间已经自动跨页传输，也没有声称豆包后端已部署。若要让云端 Worker 直接回答 `index.html` 当前作品的状态，需要下一步把该页面的聊天请求接到同一 Worker，或建立明确的同源消息桥接。
