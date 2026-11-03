@@ -69,12 +69,13 @@ export default {
    const rawObjects=Array.isArray(rawGeometry.objects)?rawGeometry.objects.slice(0,20):[];
    const geometryObjects=rawObjects.map((o,i)=>{
     if(!o||typeof o!=="object")return null;
-    const sides=Number(o.sides),rotation=Number(o.rotationDeg),x=Number(o.x),y=Number(o.y);
-    if(typeof o.shape!=="string"||o.shape.length>30||!Number.isInteger(sides)||sides<3||sides>12||![rotation,x,y].every(Number.isFinite)||Math.abs(rotation)>360||Math.abs(x)>100000||Math.abs(y)>100000)return null;
-    return {id:String(o.id||("shape-"+(i+1))).slice(0,40),shape:o.shape,sides,rotationDeg:((rotation%360)+360)%360,x,y,interiorAngleDeg:Number(((sides-2)*180/sides).toFixed(2))};
+    const sides=Number(o.sides),rotation=Number(o.rotationDeg),x=Number(o.x),y=Number(o.y),vertexAnglesDeg=Array.isArray(o.vertexAnglesDeg)?o.vertexAnglesDeg.map(Number):null;
+    if(typeof o.shape!=="string"||o.shape.length>30||!Number.isInteger(sides)||sides<3||sides>12||![rotation,x,y].every(Number.isFinite)||Math.abs(rotation)>360||Math.abs(x)>100000||Math.abs(y)>100000||(vertexAnglesDeg&&(vertexAnglesDeg.length!==sides||!vertexAnglesDeg.every(a=>Number.isFinite(a)&&a>0&&a<180))) )return null;
+    const regularShape=["正三角形","正方形","正五边形","正六边形","正多边形"].includes(o.shape);
+    return {id:String(o.id||("shape-"+(i+1))).slice(0,40),shape:o.shape,sides,rotationDeg:((rotation%360)+360)%360,x,y,vertexAnglesDeg,interiorAngleDeg:regularShape?Number(((sides-2)*180/sides).toFixed(2)):null};
    }).filter(Boolean);
    const geometryText=geometryObjects.length
-    ?"【几何编辑器传入的结构化对象数据】维度："+(rawGeometry.dimension==="3d"?"三维":"二维")+"；"+geometryObjects.map((o,i)=>"图形"+(i+1)+"（"+o.id+"）："+o.shape+"，"+o.sides+"边形，单个内角约"+o.interiorAngleDeg+"°，旋转角"+o.rotationDeg+"°，画布坐标("+o.x+","+o.y+")").join("；")+"。这些是编辑器提供的数据，不代表你直接看到了屏幕图像。只能依据这些字段作判断，不要推断未提供的边长、邻接关系或重叠情况。"
+    ?"【几何编辑器传入的结构化对象数据】维度："+(rawGeometry.dimension==="3d"?"三维":"二维")+"；"+geometryObjects.map((o,i)=>"图形"+(i+1)+"（"+o.id+"）："+o.shape+"，"+o.sides+"边形，"+(o.vertexAnglesDeg?"各顶点内角依次为"+o.vertexAnglesDeg.join("°、")+"°":o.interiorAngleDeg!==null?"单个内角约"+o.interiorAngleDeg+"°":"内角数据未提供")+"，旋转角"+o.rotationDeg+"°，画布坐标("+o.x+","+o.y+")").join("；")+"。这些是编辑器提供的数据，不代表你直接看到了屏幕图像。只能依据这些字段作判断，不要推断未提供的边长、邻接关系或重叠情况。"
     :"";
    const retrievalQuestion=(lastUser?.content||"")+" "+sceneText+" "+geometryText;
    const context=retrieve(retrievalQuestion);
