@@ -61,3 +61,23 @@ Worker 已内置轻量关键词检索知识库，覆盖：
 前端仅发送固定选项值，Worker 再次进行白名单校验；不会接受任意页面指令作为场景数据。Worker 会把情境加入本轮系统上下文，并与学生问题一起进行知识片段检索。若三个选项均为“未指定”，则按普通文字对话处理。
 
 注意：情境由学生/教师主动选择，不是机器人视觉识别，也不代表当前页面已经具备可操作几何图形模型。原 3D 拓拓和 3D 展台未被替换。
+
+## 第四阶段新增：几何对象状态接口
+
+页面现在向未来的可操作几何编辑器开放 `window.TotoAI.updateGeometryState(state)`。编辑器每次拖动、旋转或增删图形后，可把真实对象列表同步给拓拓；下一次提问会将最多 20 个对象的类型、边数、旋转角和画布坐标一并发送给 Worker。前端与 Worker 均会校验数据，Worker 根据边数计算正多边形内角，并明确限制模型不得臆测未提供的边长、邻接或重叠情况。
+
+示例（供后续图形编辑器接入）：
+
+```js
+window.TotoAI.updateGeometryState({
+  dimension: "2d",
+  objects: [
+    { id: "shape-1", shape: "正五边形", sides: 5, rotationDeg: 36, x: 120, y: 80 },
+    { id: "shape-2", shape: "正方形", sides: 4, rotationDeg: 0, x: 220, y: 80 }
+  ]
+});
+```
+
+也可通过 `window.dispatchEvent(new CustomEvent('toto:geometrychange',{detail: state}))` 同步，或调用 `window.TotoAI.clearGeometryState()` 清空。聊天面板会显示已接收的对象数量。
+
+重要：目前 `index-workbench.html` 的主工作台仍是装饰性 3D 展示 Canvas，不含真实的可拖动多边形编辑对象。因此本次交付的是经过校验的 AI 几何状态接入接口，并非已经完成画布自动读取。要让拓拓读取学生实际拖动的图形，下一步必须把真实几何编辑器的对象数据接到该接口。
