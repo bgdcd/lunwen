@@ -88,6 +88,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#dce8e9}
       <div class="toto-ai-endpoint" id="toto-ai-endpoint"><input id="toto-ai-api" type="url" placeholder="粘贴已部署的拓拓 Worker 地址，例如 https://xxx.workers.dev/chat" aria-label="拓拓 AI 服务地址"></div>
       <div class="toto-ai-context" aria-label="当前探究情境">
         <div class="toto-ai-context-title">告诉拓拓：你现在正在研究什么？（情境由你选择，并非自动识别画布）</div>
+        <div id="toto-ai-geometry-status" style="grid-column:1/-1;padding:6px 8px;border-radius:7px;background:rgba(3,18,31,.55);color:#8dbbc8;font-size:10px">几何数据：尚未接入可操作图形编辑器</div>
         <label>研究图形<select id="toto-ai-shape"><option value="未指定">未指定</option><option value="正三角形">正三角形</option><option value="正方形">正方形</option><option value="正五边形">正五边形</option><option value="正六边形">正六边形</option><option value="自定义多边形">自定义多边形</option><option value="多种图形组合">多种图形组合</option></select></label>
         <label>正在进行<select id="toto-ai-action"><option value="未指定">未指定</option><option value="观察图形">观察图形</option><option value="拖动拼接">拖动拼接</option><option value="旋转图形">旋转图形</option><option value="尝试密铺">尝试密铺</option><option value="检查顶点角度">检查顶点角度</option><option value="比较平面与立体">比较平面与立体</option></select></label>
         <label>遇到的情况<select id="toto-ai-issue"><option value="未指定">未指定</option><option value="出现缝隙">出现缝隙</option><option value="图形发生重叠">图形发生重叠</option><option value="边无法贴合">边无法贴合</option><option value="顶点角度不等于360度">顶点角度不等于360度</option><option value="不知道从哪里开始">不知道从哪里开始</option></select></label>
@@ -538,6 +539,32 @@ requestAnimationFrame(frame);
  if(!robot||!panel)return;
  const $=id=>document.getElementById(id),input=$('toto-ai-input'),messages=$('toto-ai-messages'),status=$('toto-ai-status'),send=$('toto-ai-send'),api=$('toto-ai-api'),settings=$('toto-ai-endpoint');
  let history=[],busy=false,controller=null;
+ // 几何编辑器通过此接口同步真实对象；展示用 3D 展台不会被误当成学生图形。
+ let geometryState={dimension:"2d",objects:[]};
+ const geometryStatus=$('toto-ai-geometry-status');
+ const shapeNames=['正三角形','正方形','正五边形','正六边形','正多边形','自定义多边形'];
+ function cleanGeometryState(value){
+   if(!value||typeof value!=='object'||!Array.isArray(value.objects))throw new Error('几何状态格式应为 {objects:[...]}');
+   const objects=value.objects.slice(0,20).map((o,i)=>{
+     if(!o||typeof o!=='object')throw new Error('第'+(i+1)+'个图形数据无效');
+     const sides=Number(o.sides),rotationDeg=Number(o.rotationDeg||0),x=Number(o.x||0),y=Number(o.y||0);
+     if(!shapeNames.includes(o.shape)||!Number.isInteger(sides)||sides<3||sides>12||!Number.isFinite(rotationDeg)||Math.abs(rotationDeg)>36000||![x,y].every(Number.isFinite)||Math.abs(x)>100000||Math.abs(y)>100000)throw new Error('第'+(i+1)+'个图形参数不符合要求');
+     return {id:String(o.id||('shape-'+(i+1))).slice(0,40),shape:o.shape,sides,rotationDeg:((rotationDeg%360)+360)%360,x,y,interiorAngleDeg:Number(((sides-2)*180/sides).toFixed(2))};
+   });
+   return {dimension:value.dimension==='3d'?'3d':'2d',objects};
+ }
+ function updateGeometryState(value){
+   geometryState=cleanGeometryState(value);
+   if(geometryStatus)geometryStatus.textContent=geometryState.objects.length?'几何数据：已接收 '+geometryState.objects.length+' 个图形对象（将随提问发送）':'几何数据：当前没有图形对象';
+   panel.dispatchEvent(new CustomEvent('toto:geometry-state',{detail:geometryState}));
+   return {ok:true,count:geometryState.objects.length};
+ }
+ window.TotoAI=window.TotoAI||{};
+ window.TotoAI.updateGeometryState=updateGeometryState;
+ window.TotoAI.clearGeometryState=()=>updateGeometryState({dimension:'2d',objects:[]});
+ window.TotoAI.getGeometryState=()=>JSON.parse(JSON.stringify(geometryState));
+ window.addEventListener('toto:geometrychange',e=>{try{updateGeometryState(e.detail);}catch(err){if(geometryStatus)geometryStatus.textContent='几何数据未接收：'+err.message;}});
+
  api.value=localStorage.getItem('toto_ai_endpoint')||'';
  const setStatus=t=>status.textContent=t;
  const open=()=>{panel.classList.add('open');input.focus();};
@@ -556,10 +583,11 @@ requestAnimationFrame(frame);
    if(!endpoint){settings.classList.add('show');setStatus('请先在“连接设置”中填写已部署的拓拓 AI 服务地址');return;}
    add(q,'user');input.value='';history.push({role:'user',content:q});busy=true;send.disabled=true;send.textContent='…';setStatus('拓拓正在思考…');robot.dataset.aiState='thinking';panel.dataset.busy='true';
    const sceneContext={shape:$('toto-ai-shape').value,action:$('toto-ai-action').value,issue:$('toto-ai-issue').value};
+   const geometryState=window.TotoAI.getGeometryState();
    const contextText=Object.entries(sceneContext).filter(([,v])=>v&&v!=='未指定').map(([k,v])=>({shape:'图形',action:'操作',issue:'遇到的情况'}[k]+'：'+v)).join('；');
    const pending=add('拓拓正在整理思路…','bot');controller=new AbortController();
    try{
-     const response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:history.slice(-16),sceneContext}),signal:controller.signal});
+     const response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:history.slice(-16),sceneContext,geometryState}),signal:controller.signal});
      const data=await response.json().catch(()=>({}));
      if(!response.ok)throw new Error(data.error||('服务请求失败（HTTP '+response.status+'）'));
      const answer=data.reply||data.choices?.[0]?.message?.content||'我暂时没有得到有效回答，请稍后再试。';
