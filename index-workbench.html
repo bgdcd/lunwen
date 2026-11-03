@@ -24,6 +24,34 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#dce8e9}
 .bench-wrap{position:absolute;z-index:3;left:57%;bottom:9%;width:min(40vw,62vh);aspect-ratio:1/.72;transform:translateX(-50%);pointer-events:none;animation:benchIn 1.2s ease-out both}
 #benchCanvas{width:100%;height:100%;display:block}
 @keyframes benchIn{from{opacity:0;transform:translateX(-50%) translateY(24px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* 拓拓 AI 对话层：独立叠加，不改动实验室与 3D 画布 */
+.toto-wrap{pointer-events:auto;cursor:pointer}
+#totoCanvas{pointer-events:auto}
+#toto-ai-panel{position:fixed;z-index:30;right:24px;bottom:24px;width:min(410px,calc(100vw - 32px));height:min(620px,calc(100vh - 48px));display:none;flex-direction:column;overflow:hidden;border:1px solid rgba(118,226,238,.55);border-radius:22px;background:linear-gradient(155deg,rgba(8,24,43,.97),rgba(12,35,57,.96));box-shadow:0 0 0 1px rgba(255,255,255,.08) inset,0 18px 70px rgba(0,12,28,.48),0 0 34px rgba(65,207,224,.20);backdrop-filter:blur(18px);color:#eafaff;font-family:inherit}
+#toto-ai-panel.open{display:flex;animation:totoPanelIn .22s ease-out}
+@keyframes totoPanelIn{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+.toto-ai-head{display:flex;align-items:center;gap:11px;padding:15px 16px;border-bottom:1px solid rgba(133,225,238,.2);background:linear-gradient(90deg,rgba(37,112,144,.25),rgba(40,65,110,.12))}
+.toto-ai-orb{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#092538;font-weight:900;background:radial-gradient(circle at 35% 25%,#fff 0,#aaf7ff 22%,#43c7d7 62%,#12628a 100%);box-shadow:0 0 18px rgba(84,225,240,.55)}
+.toto-ai-title{font-weight:800;letter-spacing:.06em;font-size:15px}.toto-ai-sub{font-size:11px;color:#9fc8d5;margin-top:3px}
+.toto-ai-head button{margin-left:auto;border:1px solid rgba(157,225,236,.25);background:rgba(255,255,255,.07);color:#dffaff;border-radius:9px;padding:6px 10px;cursor:pointer}
+#toto-ai-messages{flex:1;overflow:auto;padding:16px 13px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth}
+.toto-msg{max-width:88%;padding:11px 13px;border-radius:14px;font-size:13px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}
+.toto-msg.bot{align-self:flex-start;background:rgba(87,166,188,.16);border:1px solid rgba(114,219,232,.18);color:#e7faff;border-top-left-radius:4px}
+.toto-msg.user{align-self:flex-end;background:linear-gradient(135deg,#1d91a9,#3567b6);color:white;border-top-right-radius:4px}
+.toto-ai-status{min-height:18px;padding:0 15px 7px;color:#80c9d7;font-size:11px}
+.toto-ai-compose{padding:11px 12px 13px;border-top:1px solid rgba(133,225,238,.2);background:rgba(3,17,31,.45)}
+.toto-ai-endpoint{display:none;margin-bottom:9px}.toto-ai-endpoint.show{display:block}
+.toto-ai-endpoint input{width:100%;box-sizing:border-box;background:#071a2b;border:1px solid rgba(132,218,231,.3);border-radius:8px;color:#e8fbff;padding:8px;font-size:11px;outline:none}
+.toto-ai-tools{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:10px;color:#83b9c6}
+.toto-ai-tools button{background:none;border:0;color:#91d9e5;text-decoration:underline;cursor:pointer;font-size:10px}
+.toto-ai-row{display:flex;gap:8px;align-items:flex-end}
+#toto-ai-input{flex:1;resize:none;min-height:42px;max-height:110px;box-sizing:border-box;background:rgba(2,15,28,.82);border:1px solid rgba(119,216,230,.28);border-radius:12px;color:#effcff;padding:11px 12px;font:13px/1.5 inherit;outline:none}
+#toto-ai-input:focus{border-color:#5ed9e8;box-shadow:0 0 0 2px rgba(75,205,222,.12)}
+#toto-ai-send{height:42px;min-width:62px;border:0;border-radius:11px;background:linear-gradient(135deg,#55d8df,#3984c9);color:#06283b;font-weight:800;cursor:pointer}
+#toto-ai-send:disabled{opacity:.45;cursor:wait}
+@media(max-width:600px){#toto-ai-panel{right:10px;bottom:10px;width:calc(100vw - 20px);height:min(72vh,620px)}}
+
 </style>
 </head>
 <body>
@@ -32,9 +60,20 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#dce8e9}
 
   <div class="bench-wrap" aria-label="立体主工作台"><canvas id="benchCanvas" aria-hidden="true"></canvas></div>
 
-  <div class="toto-wrap" id="openTotoChat" aria-label="拓拓机器人">
+  <div class="toto-wrap" id="openTotoChat" aria-label="拓拓机器人" role="button" tabindex="0" title="点击与拓拓交流">
     <canvas id="totoCanvas" aria-hidden="true"></canvas>
   </div>
+
+  <section id="toto-ai-panel" aria-label="拓拓 AI 对话窗口">
+    <header class="toto-ai-head"><div class="toto-ai-orb">T</div><div><div class="toto-ai-title">拓拓 · AI 智能伙伴</div><div class="toto-ai-sub">豆包大模型驱动 · 立体密铺实验室</div></div><button id="toto-ai-close" type="button" aria-label="关闭">✕</button></header>
+    <div id="toto-ai-messages"><div class="toto-msg bot">你好！我是拓拓。关于图形、密铺和立体几何的问题，都可以和我讨论。我们一起探索吧！</div></div>
+    <div class="toto-ai-status" id="toto-ai-status">等待连接 AI 服务</div>
+    <div class="toto-ai-compose">
+      <div class="toto-ai-tools"><span>对话内容仅在本次页面会话中保留</span><button id="toto-ai-settings" type="button">连接设置</button><button id="toto-ai-clear" type="button">清空对话</button></div>
+      <div class="toto-ai-endpoint" id="toto-ai-endpoint"><input id="toto-ai-api" type="url" placeholder="粘贴已部署的拓拓 Worker 地址，例如 https://xxx.workers.dev/chat" aria-label="拓拓 AI 服务地址"></div>
+      <div class="toto-ai-row"><textarea id="toto-ai-input" rows="1" placeholder="输入你想问拓拓的问题…"></textarea><button id="toto-ai-send" type="button">发送</button></div>
+    </div>
+  </section>
 
 </div>
 <script>
@@ -470,5 +509,44 @@ requestAnimationFrame(frame);
 })();
 
 </script>
+
+<script>
+/* 拓拓 AI 前端桥接：保留原 3D 动画，只增加独立聊天交互 */
+(()=>{
+ const robot=document.getElementById('openTotoChat'),panel=document.getElementById('toto-ai-panel');
+ if(!robot||!panel)return;
+ const $=id=>document.getElementById(id),input=$('toto-ai-input'),messages=$('toto-ai-messages'),status=$('toto-ai-status'),send=$('toto-ai-send'),api=$('toto-ai-api'),settings=$('toto-ai-endpoint');
+ let history=[],busy=false,controller=null;
+ api.value=localStorage.getItem('toto_ai_endpoint')||'';
+ const setStatus=t=>status.textContent=t;
+ const open=()=>{panel.classList.add('open');input.focus();};
+ const close=()=>panel.classList.remove('open');
+ robot.addEventListener('click',open);
+ robot.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}});
+ $('toto-ai-close').addEventListener('click',close);
+ $('toto-ai-settings').addEventListener('click',()=>settings.classList.toggle('show'));
+ api.addEventListener('change',()=>{localStorage.setItem('toto_ai_endpoint',api.value.trim());setStatus(api.value.trim()?'服务地址已保存，请发送消息测试':'尚未配置服务地址');});
+ function add(text,who){const el=document.createElement('div');el.className='toto-msg '+who;el.textContent=text;messages.appendChild(el);messages.scrollTop=messages.scrollHeight;return el;}
+ $('toto-ai-clear').addEventListener('click',()=>{history=[];messages.innerHTML='';add('对话已清空。你好，我是拓拓，我们重新开始探索吧！','bot');setStatus('对话已清空');});
+ async function ask(){
+   const q=input.value.trim();if(!q||busy)return;
+   const endpoint=api.value.trim()||window.TOTO_AI_API||'';
+   if(!endpoint){settings.classList.add('show');setStatus('请先在“连接设置”中填写已部署的拓拓 AI 服务地址');return;}
+   add(q,'user');input.value='';history.push({role:'user',content:q});busy=true;send.disabled=true;send.textContent='…';setStatus('拓拓正在思考…');robot.dataset.aiState='thinking';
+   const pending=add('拓拓正在整理思路…','bot');controller=new AbortController();
+   try{
+     const response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:history.slice(-16)}),signal:controller.signal});
+     const data=await response.json().catch(()=>({}));
+     if(!response.ok)throw new Error(data.error||('服务请求失败（HTTP '+response.status+'）'));
+     const answer=data.reply||data.choices?.[0]?.message?.content||'我暂时没有得到有效回答，请稍后再试。';
+     pending.textContent=answer;history.push({role:'assistant',content:answer});setStatus('拓拓已准备好继续交流');robot.dataset.aiState='idle';
+   }catch(err){pending.textContent=err.name==='AbortError'?'本次回答已停止。':'连接失败：'+err.message;setStatus(err.name==='AbortError'?'已停止生成':'请检查服务地址和后端配置');robot.dataset.aiState='idle';}
+   finally{busy=false;send.disabled=false;send.textContent='发送';controller=null;input.focus();}
+ }
+ send.addEventListener('click',ask);
+ input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();ask();}});
+})();
+</script>
+
 </body>
 </html>
