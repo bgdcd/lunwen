@@ -56,8 +56,18 @@ export default {
     return {role:m.role,content:m.content.slice(0,8000)};
    });
    const lastUser=[...safe].reverse().find(m=>m.role==="user");
-   const context=lastUser?retrieve(lastUser.content):"";
-   const system=BASE_PROMPT+(context?"\n\n以下是与本轮问题相关的密铺知识资料。请优先依据这些准确知识解释，不要把资料之外的推断说成定论：\n"+context:"");
+   const allowedScene={
+    shape:["未指定","正三角形","正方形","正五边形","正六边形","自定义多边形","多种图形组合"],
+    action:["未指定","观察图形","拖动拼接","旋转图形","尝试密铺","检查顶点角度","比较平面与立体"],
+    issue:["未指定","出现缝隙","图形发生重叠","边无法贴合","顶点角度不等于360度","不知道从哪里开始"]
+   };
+   const rawScene=body.sceneContext&&typeof body.sceneContext==="object"?body.sceneContext:{};
+   const scene={};
+   for(const key of Object.keys(allowedScene))if(allowedScene[key].includes(rawScene[key]))scene[key]=rawScene[key];
+   const sceneText=Object.entries(scene).filter(([,v])=>v!=="未指定").map(([k,v])=>({shape:"研究图形",action:"当前操作",issue:"遇到的情况"}[k]+"："+v)).join("；");
+   const retrievalQuestion=(lastUser?.content||"")+" "+sceneText;
+   const context=retrieve(retrievalQuestion);
+   const system=BASE_PROMPT+(sceneText?"\n\n【学生主动提供的探究情境】"+sceneText+"。请结合这些信息给出针对性提示；它们是用户选择的情境，不代表你看到了页面或自动识别了画布。若信息不足，先提出一个具体观察问题。":"")+(context?"\n\n以下是与本轮问题相关的密铺知识资料。请优先依据这些准确知识解释，不要把资料之外的推断说成定论：\n"+context:"");
    const upstream=await fetch("https://ark.cn-beijing.volces.com/api/v3/chat/completions",{
     method:"POST",
     headers:{"Authorization":"Bearer "+env.ARK_API_KEY,"Content-Type":"application/json"},
