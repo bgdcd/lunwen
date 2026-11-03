@@ -93,3 +93,9 @@ window.TotoAI.updateGeometryState({
 重要：真实的二维自由创作编辑器位于仓库根目录的 `index.html`，现已完成数据桥接，不再只是预留接口。添加图形、拖动图形（拖动过程中实时同步）、旋转、复制、删除、清空、恢复布局和加载示例后，都会自动更新 `window.TotoAI.getGeometryState()`，并广播 `toto:geometrychange` 与 `polylab:geometry-updated` 事件。当前 `index-workbench.html` 的 `benchCanvas` 仍是独立的装饰性 3D 展示画布，不会被误报为可编辑模型。
 
 几何角度数据特别说明：正三角形、正方形、正五边形、正六边形等规则多边形可由边数计算内角；菱形不是正方形，不能用“4 边形内角都是 90°”代替真实角度。真实编辑器现在会把每个顶点的角度逐一传入 `vertexAnglesDeg`（例如菱形为 72°、108°、72°、108°），Worker 会优先使用这些实测顶点角，不再把菱形错误计算成 90°。\n\n注意两个页面目前仍是独立入口：`index.html` 中的本地拓拓可使用其内置几何检测引擎；`index-workbench.html` 中的云端 Worker 聊天读取其自身页面收到的几何状态。此提交已让真实编辑器持续输出标准化状态事件，但没有声称两个独立页面之间已经自动跨页传输，也没有声称豆包后端已部署。若要让云端 Worker 直接回答 `index.html` 当前作品的状态，需要下一步把该页面的聊天请求接到同一 Worker，或建立明确的同源消息桥接。
+
+## Cloudflare Workers Git 自动部署
+
+仓库根目录的 `wrangler.toml` 已配置 Worker 名称 `toto-ai`、入口 `toto-ai-worker/worker.js` 和兼容日期。Cloudflare Workers Builds 已连接本仓库的 `main` 分支，根目录为 `/`，部署命令为 `npx wrangler deploy`。后续向该分支提交代码会触发自动构建和部署，不需要在 Cloudflare 在线代码编辑器中粘贴源码。
+
+运行时配置仍由 Cloudflare Worker 的 Variables and Secrets 管理：`ARK_API_KEY` 必须作为 Secret，`ARK_MODEL` 必须设置为已创建的方舟推理接入点 ID。不要将密钥提交到 GitHub。
