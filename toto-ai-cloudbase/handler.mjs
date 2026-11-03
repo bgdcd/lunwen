@@ -82,7 +82,7 @@ export async function handleRequest(request,env={}){
    const retrievalQuestion=(lastUser?.content||"")+" "+sceneText+" "+geometryText+" "+geometryReportText;
    const context=retrieve(retrievalQuestion);
    const system=BASE_PROMPT+(sceneText?"\n\n【学生主动提供的探究情境】"+sceneText+"。请结合这些信息给出针对性提示；它们是用户选择的情境，不代表你看到了页面或自动识别了画布。若信息不足，先提出一个具体观察问题。":"")+(geometryText?"\n\n"+geometryText:"")+(geometryReportText?"\n\n"+geometryReportText:"")+(context?"\n\n以下是与本轮问题相关的密铺知识资料。请优先依据这些准确知识解释，不要把资料之外的推断说成定论：\n"+context:"");
-   const bailianBase=(env.BAILIAN_BASE_URL||"https://dashscope.aliyuncs.com/compatible-mode/v1").replace(/\\/+$/,"");
+   const bailianBase=(env.BAILIAN_BASE_URL||"https://dashscope.aliyuncs.com/compatible-mode/v1").replace(/\/+$/,"");
    const bailianModel=env.BAILIAN_MODEL||"qwen-plus";
    const upstream=await fetch(bailianBase+"/chat/completions",{
     method:"POST",
