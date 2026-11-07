@@ -23,6 +23,11 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
+      - name: Install launcher icon
+        working-directory: student-vote-android-shell/app/src/main
+        run: |
+          mkdir -p res/drawable-nodpi
+          base64 -d assets/launcher_icon.webp.base64 > res/drawable-nodpi/student_vote_icon.webp
       - name: Build debug APK
         working-directory: student-vote-android-shell
         run: gradle --no-daemon assembleDebug
