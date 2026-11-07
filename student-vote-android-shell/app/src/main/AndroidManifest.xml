@@ -3,6 +3,8 @@
     <application
         android:allowBackup="false"
         android:label="学生投票"
+        android:icon="@drawable/student_vote_icon"
+        android:roundIcon="@drawable/student_vote_icon"
         android:theme="@android:style/Theme.Material.Light.NoActionBar"
         android:usesCleartextTraffic="false"
         android:hardwareAccelerated="true">
